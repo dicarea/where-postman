@@ -56,7 +56,7 @@ public class GetURLAsyncTask extends AsyncTask<String, Void, StatusEnum> {
     protected void onPostExecute(StatusEnum code) {
         super.onPostExecute(code);
 
-        if (code != lastCode) {
+        if (code != lastCode && code.getOrder() > lastCode.getOrder()) {
             lastCode = code;
             createNotification("Correos", code.getName(), MyApp.getContext());
         }

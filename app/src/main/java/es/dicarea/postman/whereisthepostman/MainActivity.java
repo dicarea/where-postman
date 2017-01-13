@@ -25,11 +25,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
 
-//        NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
-//        builder.setContentTitle("Title").setContentText("content").setSmallIcon(R.mipmap.ic_launcher).setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
-//        NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-//        mNotificationManager.notify(0, builder.build());
-
         Timer timer = new Timer();
         timer.schedule(new SayHello(), 0, MINUTES * 60 * 1000);
     }
