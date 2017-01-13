@@ -1,9 +1,11 @@
 package es.dicarea.postman.whereisthepostman;
 
+import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.os.AsyncTask;
+import android.widget.TextView;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -23,8 +25,14 @@ public class GetURLAsyncTask extends AsyncTask<String, Void, StatusEnum> {
 
     private static StatusEnum lastCode = NO_DEFINIDO;
 
+    private Activity mActivity;
+
     private int NOTIFICATION_ID = 1;
     private NotificationManager mNotificationManager;
+
+    public GetURLAsyncTask(Activity activity) {
+        mActivity = activity;
+    }
 
     @Override
     protected StatusEnum doInBackground(String... strings) {
@@ -56,9 +64,13 @@ public class GetURLAsyncTask extends AsyncTask<String, Void, StatusEnum> {
     protected void onPostExecute(StatusEnum code) {
         super.onPostExecute(code);
 
+        /* Write in log the returned status. */
+        TextView textView = (TextView) mActivity.findViewById(R.id.textInfo);
+        textView.setText(textView.getText() + "\n" + System.currentTimeMillis() + " - " + code.getName());
+
         if (code != lastCode && code.getOrder() > lastCode.getOrder()) {
             lastCode = code;
-            createNotification("Correos", code.getName(), MyApp.getContext());
+            createNotification("Correos", code.getName(), mActivity);
         }
     }
 
@@ -86,7 +98,6 @@ public class GetURLAsyncTask extends AsyncTask<String, Void, StatusEnum> {
                 .setAutoCancel(true)
                 .setContentTitle(contentTitle)
                 .setContentText(contentText);
-
 
         //Show the notification
         mNotificationManager.notify(NOTIFICATION_ID, builder.build());

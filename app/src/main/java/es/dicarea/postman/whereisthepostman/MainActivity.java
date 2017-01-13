@@ -31,7 +31,7 @@ public class MainActivity extends AppCompatActivity {
 
     class SayHello extends TimerTask {
         public void run() {
-            new GetURLAsyncTask().execute(URL + CODE);
+            new GetURLAsyncTask(MainActivity.this).execute(URL + CODE);
         }
     }
 

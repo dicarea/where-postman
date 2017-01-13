@@ -10,9 +10,8 @@ public class MyApp extends Application {
         return instance;
     }
 
-    public static Context getContext(){
-        return instance;
-        // or return instance.getApplicationContext();
+    public static Context getContext() {
+        return instance.getApplicationContext();
     }
 
     @Override
