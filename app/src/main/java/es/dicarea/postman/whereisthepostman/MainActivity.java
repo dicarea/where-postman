@@ -1,19 +1,13 @@
 package es.dicarea.postman.whereisthepostman;
 
-import android.app.NotificationManager;
-import android.content.Context;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.app.NotificationCompat;
-
-import java.util.Timer;
-import java.util.TimerTask;
+import android.support.v7.app.AppCompatActivity;
+import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final String CODE = "PQ4F6P0703142520133205G";
-    private static final String URL = "http://aplicacionesweb.correos.es/localizadorenvios/track.asp?accion=LocalizaUno&numero=";
-    private static final int MINUTES = 5;
+    private MainHelper mainHelper;
+    private StatusHelper mStatusHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,14 +19,13 @@ public class MainActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
 
-        Timer timer = new Timer();
-        timer.schedule(new SayHello(), 0, MINUTES * 60 * 1000);
-    }
+        mStatusHelper = StatusHelper.getInstance();
+        mainHelper = MainHelper.getInstance();
 
-    class SayHello extends TimerTask {
-        public void run() {
-            new GetURLAsyncTask(MainActivity.this).execute(URL + CODE);
-        }
-    }
+        TextView textView = (TextView) this.findViewById(R.id.textInfo);
+        textView.setText(mStatusHelper.getHistory());
 
+        mainHelper.setActivity(this);
+        mainHelper.startTimer();
+    }
 }

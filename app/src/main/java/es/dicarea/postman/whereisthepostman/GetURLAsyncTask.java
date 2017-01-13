@@ -25,13 +25,17 @@ public class GetURLAsyncTask extends AsyncTask<String, Void, StatusEnum> {
 
     private static StatusEnum lastCode = NO_DEFINIDO;
 
+    private StatusHelper mStatusHelper;
     private Activity mActivity;
+
+    private static String log = "";
 
     private int NOTIFICATION_ID = 1;
     private NotificationManager mNotificationManager;
 
     public GetURLAsyncTask(Activity activity) {
         mActivity = activity;
+        mStatusHelper = StatusHelper.getInstance();
     }
 
     @Override
@@ -65,8 +69,9 @@ public class GetURLAsyncTask extends AsyncTask<String, Void, StatusEnum> {
         super.onPostExecute(code);
 
         /* Write in log the returned status. */
+        mStatusHelper.add(code);
         TextView textView = (TextView) mActivity.findViewById(R.id.textInfo);
-        textView.setText(textView.getText() + "\n" + System.currentTimeMillis() + " - " + code.getName());
+        textView.setText(mStatusHelper.getHistory());
 
         if (code != lastCode && code.getOrder() > lastCode.getOrder()) {
             lastCode = code;
