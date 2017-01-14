@@ -9,7 +9,7 @@ public class MainHelper {
 
     private static final String CODE = "PQ4F6P0703142520133205G";
     private static final String URL = "http://aplicacionesweb.correos.es/localizadorenvios/track.asp?accion=LocalizaUno&numero=";
-    private static final int MINUTES = 10;
+    private static final int MINUTES = 5;
 
     private boolean hasStarted = false;
     private static MainHelper instance;
@@ -41,7 +41,7 @@ public class MainHelper {
     class MyTimerTask extends TimerTask {
         @Override
         public void run() {
-            new GetURLAsyncTask(activity).execute(URL + CODE);
+            new GetURLAsyncTask().execute(URL + CODE);
         }
     }
 

@@ -1,11 +1,6 @@
 package es.dicarea.postman.whereisthepostman;
 
-import android.app.Activity;
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.content.Context;
 import android.os.AsyncTask;
-import android.widget.TextView;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -22,21 +17,6 @@ import static es.dicarea.postman.whereisthepostman.StatusEnum.NO_DEFINIDO;
 import static es.dicarea.postman.whereisthepostman.StatusEnum.PRE_REGISTRADO;
 
 public class GetURLAsyncTask extends AsyncTask<String, Void, StatusEnum> {
-
-    private static StatusEnum lastCode = NO_DEFINIDO;
-
-    private StatusHelper mStatusHelper;
-    private Activity mActivity;
-
-    private static String log = "";
-
-    private int NOTIFICATION_ID = 1;
-    private NotificationManager mNotificationManager;
-
-    public GetURLAsyncTask(Activity activity) {
-        mActivity = activity;
-        mStatusHelper = StatusHelper.getInstance();
-    }
 
     @Override
     protected StatusEnum doInBackground(String... strings) {
@@ -64,21 +44,6 @@ public class GetURLAsyncTask extends AsyncTask<String, Void, StatusEnum> {
         return NO_DEFINIDO;
     }
 
-    @Override
-    protected void onPostExecute(StatusEnum code) {
-        super.onPostExecute(code);
-
-        /* Write in log the returned status. */
-        mStatusHelper.add(code);
-        TextView textView = (TextView) mActivity.findViewById(R.id.textInfo);
-        textView.setText(mStatusHelper.getHistory());
-
-        if (code != lastCode && code.getOrder() > lastCode.getOrder()) {
-            lastCode = code;
-            createNotification("Correos", code.getName(), mActivity);
-        }
-    }
-
     private StatusEnum getStatus(String fullHtml) {
 
         if (fullHtml.contains(ENTREGADO.getName())) {
@@ -92,20 +57,6 @@ public class GetURLAsyncTask extends AsyncTask<String, Void, StatusEnum> {
         }
 
         return NO_DEFINIDO;
-    }
-
-    private void createNotification(String contentTitle, String contentText, Context context) {
-
-        NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        //Build the notification using Notification.Builder
-        Notification.Builder builder = new Notification.Builder(MyApp.getContext())
-                .setSmallIcon(android.R.drawable.stat_sys_download)
-                .setAutoCancel(true)
-                .setContentTitle(contentTitle)
-                .setContentText(contentText);
-
-        //Show the notification
-        mNotificationManager.notify(NOTIFICATION_ID, builder.build());
     }
 
     private String readStream(InputStream in) {
