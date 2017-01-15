@@ -22,4 +22,13 @@ public enum StatusEnum {
     public int getOrder() {
         return this.order;
     }
+
+    public static StatusEnum getStatusName(int n) {
+        for (StatusEnum c : values()) {
+            if (c.order == n) {
+                return c;
+            }
+        }
+        throw new IllegalArgumentException(String.valueOf(n));
+    }
 }
