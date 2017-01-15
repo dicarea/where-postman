@@ -1,5 +1,6 @@
 package es.dicarea.postman.whereisthepostman;
 
+import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -16,6 +17,8 @@ import es.dicarea.postman.whereisthepostman.db.Log;
 
 public class MainActivity extends AppCompatActivity {
 
+    private static final long INTERVAL = 5 * 60 * 1000;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -26,11 +29,44 @@ public class MainActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
 
-        AlarmManager manager = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
-        Intent intent = new Intent(this, MyReceiver.class);
-        PendingIntent pIntent = PendingIntent.getBroadcast(this, 1, intent, PendingIntent.FLAG_CANCEL_CURRENT);
-        manager.cancel(pIntent);
-        manager.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), 5 * 60 * 1000, pIntent);
+        if (!checkAlarm()) {
+            startAlarm();
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+//        stopAlarm();
+    }
+
+    private Activity getActivity() {
+        return this;
+    }
+
+    private void startAlarm() {
+        AlarmManager alarmManager = (AlarmManager) getActivity().getSystemService(Context.ALARM_SERVICE);
+        Intent intent = new Intent(getActivity(), MyReceiver.class);
+        intent.setAction(MyReceiver.ACTION_ALARM_RECEIVER);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(getActivity(), 1001, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), INTERVAL, pendingIntent);
+    }
+
+    private void stopAlarm() {
+        AlarmManager alarmManager = (AlarmManager) getActivity().getSystemService(Context.ALARM_SERVICE);
+        Intent intent = new Intent(getActivity(), MyReceiver.class);
+        intent.setAction(MyReceiver.ACTION_ALARM_RECEIVER);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(getActivity(), 1001, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+        alarmManager.cancel(pendingIntent);
+        pendingIntent.cancel();
+    }
+
+    private boolean checkAlarm() {
+        AlarmManager alarmManager = (AlarmManager) getActivity().getSystemService(Context.ALARM_SERVICE);
+        Intent intent = new Intent(getActivity(), MyReceiver.class);
+        intent.setAction(MyReceiver.ACTION_ALARM_RECEIVER);
+        boolean isWorking = (PendingIntent.getBroadcast(getActivity(), 1001, intent, PendingIntent.FLAG_NO_CREATE) != null);
+        return isWorking;
     }
 
     @Override

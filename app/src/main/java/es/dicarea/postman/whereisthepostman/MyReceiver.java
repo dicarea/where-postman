@@ -5,6 +5,7 @@ import android.content.Intent;
 
 public class MyReceiver extends android.content.BroadcastReceiver {
 
+    public static final String ACTION_ALARM_RECEIVER = "action_alarm_receiver";
     private static final String STATUS_FILENAME = "laststatus.info";
     private static final String LOG_FILENAME = "log.info";
     private static final String CODE = "PQ4F6P0703142520133205G";
