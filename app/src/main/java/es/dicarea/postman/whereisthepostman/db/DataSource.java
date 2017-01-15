@@ -50,7 +50,7 @@ public class DataSource {
 
     public List<Log> getLogs() {
         List<Log> logs = new ArrayList<>();
-        LogCursorWrapper cursor = queryLogs(null, null, DbSchema.LogTable.Cols.DATE + " DESC", "50");
+        LogCursorWrapper cursor = queryLogs(null, null, DbSchema.LogTable.Cols.DATE + " DESC", "30");
         try {
             cursor.moveToFirst();
             while (!cursor.isAfterLast()) {
