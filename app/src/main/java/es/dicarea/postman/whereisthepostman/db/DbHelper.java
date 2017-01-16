@@ -22,6 +22,14 @@ public class DbHelper extends SQLiteOpenHelper {
                 DbSchema.StatusTable.Cols.CODE +
                 ")"
         );
+
+        db.execSQL("create table " + DbSchema.TrackingTable.NAME + "(" +
+                DbSchema.TrackingTable.Cols.ID + " integer primary key autoincrement, " +
+                DbSchema.TrackingTable.Cols.CODE + ", " +
+                DbSchema.TrackingTable.Cols.ACTIVE + ", " +
+                DbSchema.TrackingTable.Cols.DELETED +
+                ")"
+        );
     }
 
     @Override

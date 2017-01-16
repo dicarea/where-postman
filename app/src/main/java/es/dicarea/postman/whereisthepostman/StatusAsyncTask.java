@@ -15,6 +15,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
+import es.dicarea.postman.whereisthepostman.BeanRepository.StatusItem;
 import es.dicarea.postman.whereisthepostman.db.DataSource;
 
 public class StatusAsyncTask extends AsyncTask<String, Void, List<StatusItem>> {

@@ -7,8 +7,11 @@ import android.database.sqlite.SQLiteDatabase;
 import java.util.ArrayList;
 import java.util.List;
 
+import es.dicarea.postman.whereisthepostman.BeanRepository;
+import es.dicarea.postman.whereisthepostman.BeanRepository.StatusItem;
 import es.dicarea.postman.whereisthepostman.CustomApp;
-import es.dicarea.postman.whereisthepostman.StatusItem;
+import es.dicarea.postman.whereisthepostman.db.WrapperRepository.StatusCursorWrapper;
+import es.dicarea.postman.whereisthepostman.db.WrapperRepository.TrackingCursorWrapper;
 
 public class DataSource {
     private static DataSource sInstance;
@@ -96,6 +99,59 @@ public class DataSource {
             }
         }
         return null;
+    }
+
+    //******************** TRACKING *******************
+
+    public List<BeanRepository.TrackingItem> getTrackingList() {
+
+        String query = "SELECT * FROM " + DbSchema.TrackingTable.NAME +
+                " WHERE " + DbSchema.TrackingTable.Cols.ACTIVE + " = 1 " +
+                " ORDER BY " + DbSchema.StatusTable.Cols.DATE + " DESC " +
+                " LIMIT 30";
+
+        List<BeanRepository.TrackingItem> trackingItems = new ArrayList<>();
+
+        Cursor cursor = mDatabase.rawQuery(query, null);
+        TrackingCursorWrapper trackingCursor = new TrackingCursorWrapper(cursor);
+        try {
+            if (trackingCursor != null && trackingCursor.moveToFirst()) {
+                while (!trackingCursor.isAfterLast()) {
+                    trackingItems.add(trackingCursor.getStatus());
+                    trackingCursor.moveToNext();
+                }
+            }
+        } finally {
+            if (trackingCursor != null) {
+                trackingCursor.close();
+            }
+        }
+
+        return trackingItems;
+    }
+
+    //******************** UTILS *******************
+    private List<T> commonGetListFromCursor(String sql, String[] selectionArgs, List<T> baba ) {
+
+        List<BeanRepository.TrackingItem> trackingItems = new ArrayList<>();
+
+        Cursor cursor = mDatabase.rawQuery(sql, selectionArgs);
+        // TrackingCursorWrapper trackingCursor = new TrackingCursorWrapper(cursor);
+        try {
+            if (cursor != null && cursor.moveToFirst()) {
+                while (!cursor.isAfterLast()) {
+                    cursor
+                    trackingItems.add(trackingCursor.getStatus());
+                    cursor.moveToNext();
+                }
+            }
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+
+        return trackingItems;
     }
 
 }
