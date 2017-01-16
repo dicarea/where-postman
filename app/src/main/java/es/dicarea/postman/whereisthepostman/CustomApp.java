@@ -3,20 +3,20 @@ package es.dicarea.postman.whereisthepostman;
 import android.app.Application;
 import android.content.Context;
 
-public class MyApp extends Application {
-    private static MyApp instance;
+public class CustomApp extends Application {
+    private static CustomApp mInstance;
 
-    public static MyApp getInstance() {
-        return instance;
+    public static CustomApp getInstance() {
+        return mInstance;
     }
 
     public static Context getContext() {
-        return instance.getApplicationContext();
+        return mInstance.getApplicationContext();
     }
 
     @Override
     public void onCreate() {
-        instance = this;
+        mInstance = this;
         super.onCreate();
     }
 }

@@ -7,7 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import java.util.ArrayList;
 import java.util.List;
 
-import es.dicarea.postman.whereisthepostman.MyApp;
+import es.dicarea.postman.whereisthepostman.CustomApp;
 
 public class DataSource {
     private static DataSource sInstance;
@@ -15,7 +15,7 @@ public class DataSource {
     private SQLiteDatabase mDatabase;
 
     private DataSource() {
-        mDatabase = new DbHelper(MyApp.getContext()).getWritableDatabase();
+        mDatabase = new DbHelper(CustomApp.getContext()).getWritableDatabase();
     }
 
     public static DataSource getInstance() {

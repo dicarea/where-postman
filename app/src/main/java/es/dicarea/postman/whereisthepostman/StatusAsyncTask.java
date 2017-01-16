@@ -3,8 +3,6 @@ package es.dicarea.postman.whereisthepostman;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.content.Context;
-import android.media.RingtoneManager;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.v4.app.NotificationCompat;
 
@@ -26,11 +24,11 @@ import static es.dicarea.postman.whereisthepostman.StatusEnum.EN_ENTREGA;
 import static es.dicarea.postman.whereisthepostman.StatusEnum.NO_DEFINIDO;
 import static es.dicarea.postman.whereisthepostman.StatusEnum.PRE_REGISTRADO;
 
-public class GetURLAsyncTask extends AsyncTask<String, Void, StatusEnum> {
+public class StatusAsyncTask extends AsyncTask<String, Void, StatusEnum> {
 
     private long lastTime;
 
-    public GetURLAsyncTask(long time) {
+    public StatusAsyncTask(long time) {
         lastTime = time;
     }
 
@@ -66,7 +64,7 @@ public class GetURLAsyncTask extends AsyncTask<String, Void, StatusEnum> {
 
         /* Check if notification necessary. */
         try {
-            checkChange(MyApp.getContext(), statusEnum);
+            checkChange(CustomApp.getContext(), statusEnum);
         } catch (IOException e) {
             e.printStackTrace();
         }

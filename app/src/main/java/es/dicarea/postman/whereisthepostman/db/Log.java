@@ -5,7 +5,6 @@ public class Log {
     private Long mDate;
     private Integer mStatus;
 
-
     public Integer getId() {
         return mId;
     }
