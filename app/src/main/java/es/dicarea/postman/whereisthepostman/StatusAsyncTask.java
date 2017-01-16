@@ -11,9 +11,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.List;
 
 import es.dicarea.postman.whereisthepostman.db.DataSource;
 import es.dicarea.postman.whereisthepostman.db.Log;
@@ -24,22 +25,55 @@ import static es.dicarea.postman.whereisthepostman.StatusEnum.EN_ENTREGA;
 import static es.dicarea.postman.whereisthepostman.StatusEnum.NO_DEFINIDO;
 import static es.dicarea.postman.whereisthepostman.StatusEnum.PRE_REGISTRADO;
 
-public class StatusAsyncTask extends AsyncTask<String, Void, StatusEnum> {
+public class StatusAsyncTask extends AsyncTask<String, Void, List<StatusItem>> {
 
-    private long lastTime;
+    private static final String URL = "http://aplicacionesweb.correos.es/localizadorenvios/track.asp?accion=LocalizaUno&numero=";
+    private long timeNow;
+
 
     public StatusAsyncTask(long time) {
-        lastTime = time;
+        timeNow = time;
     }
 
     @Override
-    protected StatusEnum doInBackground(String... strings) {
+    protected List<StatusItem> doInBackground(String... strings) {
 
+        List<StatusItem> notifyList = new ArrayList<>();
+
+        for (String code : strings) {
+            StatusEnum status = httpRequest(code);
+            storeLog(status);
+            if (checkNotifyRequired(status)) {
+                StatusItem statusItem = new StatusItem();
+                statusItem.setCode(code);
+                statusItem.setTime(timeNow);
+                statusItem.setStatus(status);
+                notifyList.add(statusItem);
+            }
+        }
+
+        return notifyList;
+    }
+
+    @Override
+    protected void onPostExecute(List<StatusItem> result) {
+        for (StatusItem statusItem : result) {
+            sendNotification(statusItem);
+        }
+    }
+
+    private void storeLog(StatusEnum statusEnum) {
+        DataSource dataSource = DataSource.getInstance();
+        Log log = new Log(timeNow, statusEnum.getOrder());
+        dataSource.addLog(log);
+    }
+
+    private StatusEnum httpRequest(String code) {
         URL url;
         HttpURLConnection urlConnection = null;
 
         try {
-            url = new URL(strings[0]);
+            url = new URL(URL + code);
             urlConnection = (HttpURLConnection) url.openConnection();
 
             int responseCode = urlConnection.getResponseCode();
@@ -49,50 +83,30 @@ public class StatusAsyncTask extends AsyncTask<String, Void, StatusEnum> {
                 return getStatus(serverResponse);
             }
 
-        } catch (MalformedURLException e) {
+        } catch (Exception e) {
             e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        } finally {
+            if (urlConnection != null) {
+                urlConnection.disconnect();
+            }
 
-        return NO_DEFINIDO;
+            return NO_DEFINIDO;
+        }
     }
 
-    @Override
-    protected void onPostExecute(StatusEnum statusEnum) {
-        super.onPostExecute(statusEnum);
-
-        /* Check if notification necessary. */
-        try {
-            checkChange(CustomApp.getContext(), statusEnum);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        /* Store the new request. */
-        DataSource ds = DataSource.getInstance();
-        Log log = new Log();
-        log.setDate(lastTime);
-        log.setStatus(statusEnum.getOrder());
-        ds.addLog(log);
-    }
-
-    public void checkChange(Context context, StatusEnum status) throws IOException {
-
+    public boolean checkNotifyRequired(StatusEnum status) {
         DataSource ds = DataSource.getInstance();
         Integer lastStatus = ds.getLastStatus();
-
-        if (lastStatus == null || lastStatus < status.getOrder()) {
-            sendNotification(context, status);
-        }
-
+        return lastStatus == null || lastStatus < status.getOrder();
     }
 
-    public void sendNotification(Context context, StatusEnum status) {
+    public void sendNotification(StatusItem statusItem) {
+
+        Context context = CustomApp.getContext();
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
-        String now = dateFormat.format(System.currentTimeMillis());
-        String line = now + " " + status.getName();
+        String now = dateFormat.format(statusItem.getTime());
+        String line = statusItem.getCode() + " " + now + " " + statusItem.getStatus().getName();
 
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(context).setSmallIcon(android.R.drawable.ic_dialog_alert)
