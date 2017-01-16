@@ -6,24 +6,17 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.support.v4.app.NotificationCompat;
 
-import java.io.BufferedReader;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.select.Elements;
+
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
 import es.dicarea.postman.whereisthepostman.db.DataSource;
 import es.dicarea.postman.whereisthepostman.db.Log;
-
-import static es.dicarea.postman.whereisthepostman.StatusEnum.ADMITIDO;
-import static es.dicarea.postman.whereisthepostman.StatusEnum.ENTREGADO;
-import static es.dicarea.postman.whereisthepostman.StatusEnum.EN_ENTREGA;
-import static es.dicarea.postman.whereisthepostman.StatusEnum.NO_DEFINIDO;
-import static es.dicarea.postman.whereisthepostman.StatusEnum.PRE_REGISTRADO;
 
 public class StatusAsyncTask extends AsyncTask<String, Void, List<StatusItem>> {
 
@@ -41,7 +34,7 @@ public class StatusAsyncTask extends AsyncTask<String, Void, List<StatusItem>> {
         List<StatusItem> notifyList = new ArrayList<>();
 
         for (String code : strings) {
-            StatusEnum status = httpRequest(code);
+            StatusEnum status = findStatus(code);
             storeLog(status);
             if (checkNotifyRequired(status)) {
                 StatusItem statusItem = new StatusItem();
@@ -68,32 +61,6 @@ public class StatusAsyncTask extends AsyncTask<String, Void, List<StatusItem>> {
         dataSource.addLog(log);
     }
 
-    private StatusEnum httpRequest(String code) {
-        URL url;
-        HttpURLConnection urlConnection = null;
-
-        try {
-            url = new URL(URL + code);
-            urlConnection = (HttpURLConnection) url.openConnection();
-
-            int responseCode = urlConnection.getResponseCode();
-
-            if (responseCode == HttpURLConnection.HTTP_OK) {
-                String serverResponse = readStream(urlConnection.getInputStream());
-                return getStatus(serverResponse);
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            if (urlConnection != null) {
-                urlConnection.disconnect();
-            }
-
-            return NO_DEFINIDO;
-        }
-    }
-
     public boolean checkNotifyRequired(StatusEnum status) {
         DataSource ds = DataSource.getInstance();
         Integer lastStatus = ds.getLastStatus();
@@ -116,47 +83,18 @@ public class StatusAsyncTask extends AsyncTask<String, Void, List<StatusItem>> {
         mNotificationManager.notify(001, mBuilder.build());
     }
 
-    private StatusEnum getStatus(String fullHtml) {
-
-        if (fullHtml.contains(ENTREGADO.getName())) {
-            return ENTREGADO;
-        } else if (fullHtml.contains(EN_ENTREGA.getName())) {
-            return EN_ENTREGA;
-        } else if (fullHtml.contains(ADMITIDO.getName())) {
-            return ADMITIDO;
-        } else if (fullHtml.contains(PRE_REGISTRADO.getName())) {
-            return PRE_REGISTRADO;
-        }
-
-        return NO_DEFINIDO;
-    }
-
-    private StatusEnum findStatus() {
-        Document doc = Jsoup.connect("http://en.wikipedia.org/").get();
-        Elements newsHeadlines = doc.select("#mp-itn b a");
-        return null;
-    }
-
-    private String readStream(InputStream in) {
-        BufferedReader reader = null;
-        StringBuffer response = new StringBuffer();
+    private StatusEnum findStatus(String code) {
         try {
-            reader = new BufferedReader(new InputStreamReader(in));
-            String line = "";
-            while ((line = reader.readLine()) != null) {
-                response.append(line);
+            Document doc = Jsoup.connect(URL + code).get();
+            Elements elements = doc.select("span.txtNormal");
+            if (elements != null && elements.size() > 0) {
+                String statusStr = elements.get(elements.size() - 1).text().trim();
+                return StatusEnum.getStatus(statusStr);
             }
         } catch (IOException e) {
             e.printStackTrace();
-        } finally {
-            if (reader != null) {
-                try {
-                    reader.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
         }
-        return response.toString();
+        return StatusEnum.NO_DEFINIDO;
     }
+
 }

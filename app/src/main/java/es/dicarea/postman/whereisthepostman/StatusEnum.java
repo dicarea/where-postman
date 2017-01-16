@@ -23,12 +23,21 @@ public enum StatusEnum {
         return this.order;
     }
 
-    public static StatusEnum getStatusName(int n) {
+    public static StatusEnum getStatus(String name) {
+        for (StatusEnum c : values()) {
+            if (c.name.equals(name)) {
+                return c;
+            }
+        }
+        return null;
+    }
+
+    public static StatusEnum getStatus(int n) {
         for (StatusEnum c : values()) {
             if (c.order == n) {
                 return c;
             }
         }
-        throw new IllegalArgumentException(String.valueOf(n));
+        return null;
     }
 }

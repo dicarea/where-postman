@@ -5,6 +5,9 @@ public class Log {
     private Long mDate;
     private Integer mStatus;
 
+    public Log() {
+    }
+
     public Log(Long date, Integer status) {
         mDate = date;
         mStatus = status;

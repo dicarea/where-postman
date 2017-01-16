@@ -46,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
         StringBuilder sb = new StringBuilder();
         for (Log log : listLogs) {
             String dateStr = sdf.format(log.getDate());
-            String statusName = StatusEnum.getStatusName(log.getStatus()).getName();
+            String statusName = StatusEnum.getStatus(log.getStatus()).getName();
             sb.append(dateStr + " -> " + statusName + "\n");
         }
 
