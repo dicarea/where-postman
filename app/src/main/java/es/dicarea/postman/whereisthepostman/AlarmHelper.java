@@ -1,38 +1,38 @@
 package es.dicarea.postman.whereisthepostman;
 
-import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.os.SystemClock;
 
 public class AlarmHelper {
 
-    private static final long INTERVAL = 5 * 60 * 1000;
+    private static final long INTERVAL = AlarmManager.INTERVAL_FIFTEEN_MINUTES;
     private static final int REQUEST_CODE = 1001;
 
-    private Activity mActivity;
+    private Context mContext;
     private AlarmManager mAlarmManager;
 
-    AlarmHelper(Activity activity) {
-        mActivity = activity;
-        mAlarmManager = (AlarmManager) getActivity().getSystemService(Context.ALARM_SERVICE);
+    AlarmHelper(Context context) {
+        mContext = context;
+        mAlarmManager = (AlarmManager) getContext().getSystemService(Context.ALARM_SERVICE);
     }
 
-    private Activity getActivity() {
-        return mActivity;
+    private Context getContext() {
+        return mContext;
     }
 
     //**********************************
 
     private Intent createCommonIntent() {
-        Intent intent = new Intent(getActivity(), StatusReceiver.class);
+        Intent intent = new Intent(getContext(), StatusReceiver.class);
         intent.setAction(StatusReceiver.ACTION_ALARM_RECEIVER);
         return intent;
     }
 
     private PendingIntent crateCommonPendingIntent(Intent intent) {
-        return PendingIntent.getBroadcast(getActivity(), REQUEST_CODE, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+        return PendingIntent.getBroadcast(getContext(), REQUEST_CODE, intent, PendingIntent.FLAG_CANCEL_CURRENT);
     }
 
     //**********************************
@@ -40,7 +40,8 @@ public class AlarmHelper {
     public void startAlarm() {
         Intent intent = createCommonIntent();
         PendingIntent pendingIntent = crateCommonPendingIntent(intent);
-        mAlarmManager.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), INTERVAL, pendingIntent);
+        mAlarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime(),
+                INTERVAL, pendingIntent);
     }
 
     public void stopAlarm() {
@@ -52,8 +53,7 @@ public class AlarmHelper {
 
     public boolean checkAlarm() {
         Intent intent = createCommonIntent();
-        boolean isWorking = (PendingIntent.getBroadcast(getActivity(), REQUEST_CODE, intent, PendingIntent.FLAG_NO_CREATE) != null);
-        return isWorking;
+        return PendingIntent.getBroadcast(getContext(), REQUEST_CODE, intent, PendingIntent.FLAG_NO_CREATE) != null;
     }
 
 }

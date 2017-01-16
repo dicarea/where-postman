@@ -12,29 +12,20 @@ import es.dicarea.postman.whereisthepostman.db.Log;
 
 public class MainActivity extends AppCompatActivity {
 
-    private AlarmHelper mAlarmHelper;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        mAlarmHelper = new AlarmHelper(this);
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-
-        if (!mAlarmHelper.checkAlarm()) {
-            mAlarmHelper.startAlarm();
-        }
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-//        stopAlarm();
     }
 
     @Override

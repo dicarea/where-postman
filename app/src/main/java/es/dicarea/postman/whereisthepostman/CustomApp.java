@@ -18,5 +18,8 @@ public class CustomApp extends Application {
     public void onCreate() {
         mInstance = this;
         super.onCreate();
+
+        AlarmHelper alarmHelper = new AlarmHelper(this);
+        alarmHelper.startAlarm();
     }
 }
