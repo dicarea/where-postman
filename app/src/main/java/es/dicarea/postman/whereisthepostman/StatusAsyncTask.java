@@ -131,6 +131,12 @@ public class StatusAsyncTask extends AsyncTask<String, Void, List<StatusItem>> {
         return NO_DEFINIDO;
     }
 
+    private StatusEnum findStatus() {
+        Document doc = Jsoup.connect("http://en.wikipedia.org/").get();
+        Elements newsHeadlines = doc.select("#mp-itn b a");
+        return null;
+    }
+
     private String readStream(InputStream in) {
         BufferedReader reader = null;
         StringBuffer response = new StringBuffer();
