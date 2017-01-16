@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import es.dicarea.postman.whereisthepostman.db.DataSource;
-import es.dicarea.postman.whereisthepostman.db.Log;
 
 public class StatusAsyncTask extends AsyncTask<String, Void, List<StatusItem>> {
 
@@ -42,7 +41,7 @@ public class StatusAsyncTask extends AsyncTask<String, Void, List<StatusItem>> {
                 statusItem.setStatus(status);
                 notifyList.add(statusItem);
             }
-            storeLog(status, code);
+            storeStatus(status, code);
         }
 
         return notifyList;
@@ -55,16 +54,19 @@ public class StatusAsyncTask extends AsyncTask<String, Void, List<StatusItem>> {
         }
     }
 
-    private void storeLog(StatusEnum statusEnum, String code) {
+    private void storeStatus(StatusEnum statusEnum, String code) {
         DataSource dataSource = DataSource.getInstance();
-        Log log = new Log(timeNow, statusEnum.getOrder(), code);
-        dataSource.addLog(log);
+        StatusItem statusItem = new StatusItem();
+        statusItem.setTime(timeNow);
+        statusItem.setStatus(statusEnum);
+        statusItem.setCode(code);
+        dataSource.addStatus(statusItem);
     }
 
     public boolean checkNotifyRequired(StatusEnum status, String code) {
         DataSource ds = DataSource.getInstance();
-        Log lastLog = ds.getLastLog(code);
-        return lastLog == null || lastLog.getStatus() < status.getOrder();
+        StatusItem lastStatus = ds.getLastStatus(code);
+        return lastStatus == null || lastStatus.getStatus().getOrder() < status.getOrder();
     }
 
     public void sendNotification(StatusItem statusItem) {
@@ -73,14 +75,14 @@ public class StatusAsyncTask extends AsyncTask<String, Void, List<StatusItem>> {
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
         String now = dateFormat.format(statusItem.getTime());
-        String line = statusItem.getCode() + " " + now + " " + statusItem.getStatus().getName();
+        String line = now + " -> " + statusItem.getStatus().getName();
 
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(context).setSmallIcon(android.R.drawable.ic_dialog_alert)
-                        .setContentTitle("Correos").setContentText(line).setDefaults(Notification.DEFAULT_SOUND);
+                        .setContentTitle(statusItem.getCode()).setContentText(line).setDefaults(Notification.DEFAULT_SOUND);
 
         NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        mNotificationManager.notify(001, mBuilder.build());
+        mNotificationManager.notify(statusItem.getStatus().getOrder(), mBuilder.build());
     }
 
     private StatusEnum findStatus(String code) {

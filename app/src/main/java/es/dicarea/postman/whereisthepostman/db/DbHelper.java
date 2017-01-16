@@ -15,11 +15,11 @@ public class DbHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
 
-        db.execSQL("create table " + DbSchema.LogTable.NAME + "(" +
-                DbSchema.LogTable.Cols.ID + " integer primary key autoincrement, " +
-                DbSchema.LogTable.Cols.DATE + ", " +
-                DbSchema.LogTable.Cols.STATUS + ", " +
-                DbSchema.LogTable.Cols.CODE +
+        db.execSQL("create table " + DbSchema.StatusTable.NAME + "(" +
+                DbSchema.StatusTable.Cols.ID + " integer primary key autoincrement, " +
+                DbSchema.StatusTable.Cols.DATE + ", " +
+                DbSchema.StatusTable.Cols.STATUS + ", " +
+                DbSchema.StatusTable.Cols.CODE +
                 ")"
         );
     }

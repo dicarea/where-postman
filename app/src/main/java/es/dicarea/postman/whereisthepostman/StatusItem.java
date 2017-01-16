@@ -1,6 +1,7 @@
 package es.dicarea.postman.whereisthepostman;
 
 public class StatusItem {
+    private Integer mId;
     private String mCode;
     private Long mTime;
     private StatusEnum mStatus;
@@ -27,5 +28,13 @@ public class StatusItem {
 
     public void setStatus(StatusEnum status) {
         mStatus = status;
+    }
+
+    public Integer getId() {
+        return mId;
+    }
+
+    public void setId(Integer id) {
+        mId = id;
     }
 }

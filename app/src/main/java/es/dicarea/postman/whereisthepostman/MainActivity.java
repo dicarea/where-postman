@@ -8,7 +8,6 @@ import java.text.SimpleDateFormat;
 import java.util.List;
 
 import es.dicarea.postman.whereisthepostman.db.DataSource;
-import es.dicarea.postman.whereisthepostman.db.Log;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -39,15 +38,15 @@ public class MainActivity extends AppCompatActivity {
 
     private String getTextViewContent() {
         DataSource ds = DataSource.getInstance();
-        List<Log> listLogs = ds.getLogs();
+        List<StatusItem> statusList = ds.getStatusList();
 
         SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
 
         StringBuilder sb = new StringBuilder();
-        for (Log log : listLogs) {
-            String dateStr = sdf.format(log.getDate());
-            String statusName = StatusEnum.getStatus(log.getStatus()).getName();
-            sb.append(log.getCode() + " - " + dateStr + " - " + statusName + "\n");
+        for (StatusItem statusItem : statusList) {
+            String dateStr = sdf.format(statusItem.getTime());
+            String statusName = statusItem.getStatus().getName();
+            sb.append(statusItem.getCode() + "\n\t\t" + dateStr + " - " + statusName + "\n");
         }
 
         return sb.toString();

@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import es.dicarea.postman.whereisthepostman.CustomApp;
+import es.dicarea.postman.whereisthepostman.StatusItem;
 
 public class DataSource {
     private static DataSource sInstance;
@@ -25,73 +26,73 @@ public class DataSource {
         return sInstance;
     }
 
-    private static ContentValues getContentValues(Log log) {
+    private static ContentValues getContentValues(StatusItem statusItem) {
         ContentValues values = new ContentValues();
-        values.put(DbSchema.LogTable.Cols.ID, log.getId());
-        values.put(DbSchema.LogTable.Cols.DATE, log.getDate());
-        values.put(DbSchema.LogTable.Cols.STATUS, log.getStatus());
-        values.put(DbSchema.LogTable.Cols.CODE, log.getCode());
+        values.put(DbSchema.StatusTable.Cols.ID, statusItem.getId());
+        values.put(DbSchema.StatusTable.Cols.DATE, statusItem.getTime());
+        values.put(DbSchema.StatusTable.Cols.STATUS, statusItem.getStatus().getOrder());
+        values.put(DbSchema.StatusTable.Cols.CODE, statusItem.getCode());
         return values;
     }
 
-    public void addLog(Log log) {
-        ContentValues values = getContentValues(log);
-        long id = mDatabase.insert(DbSchema.LogTable.NAME, null, values);
-        log.setId(((int) id));
+    public void addStatus(StatusItem statusItem) {
+        ContentValues values = getContentValues(statusItem);
+        long id = mDatabase.insert(DbSchema.StatusTable.NAME, null, values);
+        statusItem.setId(((int) id));
     }
 
-    public void deleteLog(Log log) {
-        mDatabase.delete(DbSchema.LogTable.NAME, DbSchema.LogTable.Cols.ID + " = ?", new String[]{log.getId().toString()});
+    public void deleteStatus(StatusItem statusItem) {
+        mDatabase.delete(DbSchema.StatusTable.NAME, DbSchema.StatusTable.Cols.ID + " = ?", new String[]{statusItem.getId().toString()});
     }
 
-    private void updateLog(Log log) {
-        ContentValues values = getContentValues(log);
-        mDatabase.update(DbSchema.LogTable.NAME, values, DbSchema.LogTable.Cols.ID + " = " + log.getId(), null);
+    private void updateStatus(StatusItem statusItem) {
+        ContentValues values = getContentValues(statusItem);
+        mDatabase.update(DbSchema.StatusTable.NAME, values, DbSchema.StatusTable.Cols.ID + " = " + statusItem.getId(), null);
     }
 
-    public List<Log> getLogs() {
+    public List<StatusItem> getStatusList() {
 
-        String query = "SELECT * FROM " + DbSchema.LogTable.NAME +
-                " ORDER BY " + DbSchema.LogTable.Cols.DATE + " DESC " +
+        String query = "SELECT * FROM " + DbSchema.StatusTable.NAME +
+                " ORDER BY " + DbSchema.StatusTable.Cols.DATE + " DESC " +
                 " LIMIT 30";
 
-        List<Log> logs = new ArrayList<>();
+        List<StatusItem> statusItems = new ArrayList<>();
 
         Cursor cursor = mDatabase.rawQuery(query, null);
-        LogCursorWrapper logCursor = new LogCursorWrapper(cursor);
+        StatusCursorWrapper statusCursor = new StatusCursorWrapper(cursor);
         try {
-            if (logCursor != null && logCursor.moveToFirst()) {
-                while (!logCursor.isAfterLast()) {
-                    logs.add(logCursor.getLog());
-                    logCursor.moveToNext();
+            if (statusCursor != null && statusCursor.moveToFirst()) {
+                while (!statusCursor.isAfterLast()) {
+                    statusItems.add(statusCursor.getStatus());
+                    statusCursor.moveToNext();
                 }
             }
         } finally {
-            if (logCursor != null) {
-                logCursor.close();
+            if (statusCursor != null) {
+                statusCursor.close();
             }
         }
 
-        return logs;
+        return statusItems;
     }
 
-    public Log getLastLog(String code) {
+    public StatusItem getLastStatus(String code) {
 
-        String query = "SELECT * FROM " + DbSchema.LogTable.NAME +
-                " WHERE " + DbSchema.LogTable.Cols.CODE + " = ? " +
-                " ORDER BY " + DbSchema.LogTable.Cols.DATE + " DESC " +
+        String query = "SELECT * FROM " + DbSchema.StatusTable.NAME +
+                " WHERE " + DbSchema.StatusTable.Cols.CODE + " = ? " +
+                " ORDER BY " + DbSchema.StatusTable.Cols.DATE + " DESC " +
                 " LIMIT 1";
         String[] args = {code};
 
         Cursor cursor = mDatabase.rawQuery(query, args);
-        LogCursorWrapper logCursor = new LogCursorWrapper(cursor);
+        StatusCursorWrapper statusCursor = new StatusCursorWrapper(cursor);
         try {
-            if (cursor != null && logCursor.moveToFirst()) {
-                return logCursor.getLog();
+            if (cursor != null && statusCursor.moveToFirst()) {
+                return statusCursor.getStatus();
             }
         } finally {
-            if (logCursor != null) {
-                logCursor.close();
+            if (statusCursor != null) {
+                statusCursor.close();
             }
         }
         return null;
