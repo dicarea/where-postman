@@ -4,13 +4,15 @@ public class Log {
     private Integer mId;
     private Long mDate;
     private Integer mStatus;
+    private String mCode;
 
     public Log() {
     }
 
-    public Log(Long date, Integer status) {
+    public Log(Long date, Integer status, String code) {
         mDate = date;
         mStatus = status;
+        mCode = code;
     }
 
     public Integer getId() {
@@ -35,5 +37,13 @@ public class Log {
 
     public void setStatus(Integer status) {
         mStatus = status;
+    }
+
+    public String getCode() {
+        return mCode;
+    }
+
+    public void setCode(String code) {
+        mCode = code;
     }
 }

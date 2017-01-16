@@ -18,7 +18,8 @@ public class DbHelper extends SQLiteOpenHelper {
         db.execSQL("create table " + DbSchema.LogTable.NAME + "(" +
                 DbSchema.LogTable.Cols.ID + " integer primary key autoincrement, " +
                 DbSchema.LogTable.Cols.DATE + ", " +
-                DbSchema.LogTable.Cols.STATUS +
+                DbSchema.LogTable.Cols.STATUS + ", " +
+                DbSchema.LogTable.Cols.CODE +
                 ")"
         );
     }

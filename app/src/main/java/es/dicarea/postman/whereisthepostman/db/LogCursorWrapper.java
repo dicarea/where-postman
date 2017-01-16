@@ -12,11 +12,13 @@ public class LogCursorWrapper extends CursorWrapper {
         Integer id = getInt(getColumnIndex(DbSchema.LogTable.Cols.ID));
         Long date = getLong(getColumnIndex(DbSchema.LogTable.Cols.DATE));
         Integer status = getInt(getColumnIndex(DbSchema.LogTable.Cols.STATUS));
+        String code = getString(getColumnIndex(DbSchema.LogTable.Cols.CODE));
 
         Log log = new Log();
         log.setId(id);
         log.setDate(date);
         log.setStatus(status);
+        log.setCode(code);
 
         return log;
     }

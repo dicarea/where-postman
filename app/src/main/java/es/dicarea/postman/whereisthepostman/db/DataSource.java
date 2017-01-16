@@ -30,6 +30,7 @@ public class DataSource {
         values.put(DbSchema.LogTable.Cols.ID, log.getId());
         values.put(DbSchema.LogTable.Cols.DATE, log.getDate());
         values.put(DbSchema.LogTable.Cols.STATUS, log.getStatus());
+        values.put(DbSchema.LogTable.Cols.CODE, log.getCode());
         return values;
     }
 
@@ -49,45 +50,51 @@ public class DataSource {
     }
 
     public List<Log> getLogs() {
+
+        String query = "SELECT * FROM " + DbSchema.LogTable.NAME +
+                " ORDER BY " + DbSchema.LogTable.Cols.DATE + " DESC " +
+                " LIMIT 30";
+
         List<Log> logs = new ArrayList<>();
-        LogCursorWrapper cursor = queryLogs(null, null, DbSchema.LogTable.Cols.DATE + " DESC", "30");
+
+        Cursor cursor = mDatabase.rawQuery(query, null);
+        LogCursorWrapper logCursor = new LogCursorWrapper(cursor);
         try {
-            cursor.moveToFirst();
-            while (!cursor.isAfterLast()) {
-                logs.add(cursor.getLog());
-                cursor.moveToNext();
+            if (logCursor != null && logCursor.moveToFirst()) {
+                while (!logCursor.isAfterLast()) {
+                    logs.add(logCursor.getLog());
+                    logCursor.moveToNext();
+                }
             }
         } finally {
-            cursor.close();
+            if (logCursor != null) {
+                logCursor.close();
+            }
         }
+
         return logs;
     }
 
-    public Integer getLastStatus() {
-        LogCursorWrapper cursor = queryLogs(null, null, DbSchema.LogTable.Cols.DATE + " DESC", "1");
+    public Log getLastLog(String code) {
+
+        String query = "SELECT * FROM " + DbSchema.LogTable.NAME +
+                " WHERE " + DbSchema.LogTable.Cols.CODE + " = ? " +
+                " ORDER BY " + DbSchema.LogTable.Cols.DATE + " DESC " +
+                " LIMIT 1";
+        String[] args = {code};
+
+        Cursor cursor = mDatabase.rawQuery(query, args);
+        LogCursorWrapper logCursor = new LogCursorWrapper(cursor);
         try {
-            cursor.moveToFirst();
-            while (!cursor.isAfterLast()) {
-                return cursor.getLog().getStatus();
+            if (cursor != null && logCursor.moveToFirst()) {
+                return logCursor.getLog();
             }
         } finally {
-            cursor.close();
+            if (logCursor != null) {
+                logCursor.close();
+            }
         }
         return null;
-    }
-
-    private LogCursorWrapper queryLogs(String whereClause, String[] whereArgs, String orderBy, String limit) {
-        Cursor cursor = mDatabase.query(
-                DbSchema.LogTable.NAME,
-                null, // Columns - null selects all columns
-                whereClause,
-                whereArgs,
-                null, // groupBy
-                null, // having
-                orderBy, // orderBy,
-                limit // limit
-        );
-        return new LogCursorWrapper(cursor);
     }
 
 }

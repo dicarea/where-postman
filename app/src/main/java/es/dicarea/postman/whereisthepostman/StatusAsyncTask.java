@@ -35,14 +35,14 @@ public class StatusAsyncTask extends AsyncTask<String, Void, List<StatusItem>> {
 
         for (String code : strings) {
             StatusEnum status = findStatus(code);
-            storeLog(status);
-            if (checkNotifyRequired(status)) {
+            if (checkNotifyRequired(status, code)) {
                 StatusItem statusItem = new StatusItem();
                 statusItem.setCode(code);
                 statusItem.setTime(timeNow);
                 statusItem.setStatus(status);
                 notifyList.add(statusItem);
             }
+            storeLog(status, code);
         }
 
         return notifyList;
@@ -55,16 +55,16 @@ public class StatusAsyncTask extends AsyncTask<String, Void, List<StatusItem>> {
         }
     }
 
-    private void storeLog(StatusEnum statusEnum) {
+    private void storeLog(StatusEnum statusEnum, String code) {
         DataSource dataSource = DataSource.getInstance();
-        Log log = new Log(timeNow, statusEnum.getOrder());
+        Log log = new Log(timeNow, statusEnum.getOrder(), code);
         dataSource.addLog(log);
     }
 
-    public boolean checkNotifyRequired(StatusEnum status) {
+    public boolean checkNotifyRequired(StatusEnum status, String code) {
         DataSource ds = DataSource.getInstance();
-        Integer lastStatus = ds.getLastStatus();
-        return lastStatus == null || lastStatus < status.getOrder();
+        Log lastLog = ds.getLastLog(code);
+        return lastLog == null || lastLog.getStatus() < status.getOrder();
     }
 
     public void sendNotification(StatusItem statusItem) {
