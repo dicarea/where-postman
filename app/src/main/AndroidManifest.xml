@@ -18,10 +18,13 @@
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
-
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+        <activity
+            android:name="es.dicarea.postman.whereisthepostman.db.AndroidDatabaseManager"
+            android:theme="@style/Theme.AppCompat.Light"/>
+
         <receiver android:name="es.dicarea.postman.whereisthepostman.StatusReceiver"/>
     </application>
 

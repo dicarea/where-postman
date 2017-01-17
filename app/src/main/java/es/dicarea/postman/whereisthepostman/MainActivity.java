@@ -1,13 +1,16 @@
 package es.dicarea.postman.whereisthepostman;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
 import android.widget.TextView;
 
 import java.text.SimpleDateFormat;
 import java.util.List;
 
 import es.dicarea.postman.whereisthepostman.BeanRepository.StatusItem;
+import es.dicarea.postman.whereisthepostman.db.AndroidDatabaseManager;
 import es.dicarea.postman.whereisthepostman.db.DataSource;
 
 public class MainActivity extends AppCompatActivity {
@@ -35,6 +38,13 @@ public class MainActivity extends AppCompatActivity {
         String text = getTextViewContent();
         TextView textView = (TextView) this.findViewById(R.id.textInfo);
         textView.setText(text);
+
+        textView.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                Intent dbmanager = new Intent(MainActivity.this, AndroidDatabaseManager.class);
+                startActivity(dbmanager);
+            }
+        });
     }
 
     private String getTextViewContent() {
