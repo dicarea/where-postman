@@ -9,13 +9,21 @@ import es.dicarea.postman.whereisthepostman.StatusEnum;
 
 public class WrapperRepository {
 
-    public static class StatusCursorWrapper extends CursorWrapper {
+    public abstract static class CustomWrapper<T> extends CursorWrapper {
+        public CustomWrapper(Cursor cursor) {
+            super(cursor);
+        }
+
+        public abstract T getElement();
+    }
+
+    public static class StatusCursorWrapper extends CustomWrapper {
 
         public StatusCursorWrapper(Cursor cursor) {
             super(cursor);
         }
 
-        public StatusItem getStatus() {
+        public StatusItem getElement() {
             Integer id = getInt(getColumnIndex(DbSchema.StatusTable.Cols.ID));
             Long time = getLong(getColumnIndex(DbSchema.StatusTable.Cols.DATE));
             Integer status = getInt(getColumnIndex(DbSchema.StatusTable.Cols.STATUS));
@@ -32,13 +40,13 @@ public class WrapperRepository {
 
     }
 
-    public static class TrackingCursorWrapper extends CursorWrapper {
+    public static class TrackingCursorWrapper extends CustomWrapper {
 
         public TrackingCursorWrapper(Cursor cursor) {
             super(cursor);
         }
 
-        public TrackingItem getStatus() {
+        public TrackingItem getElement() {
             Integer id = getInt(getColumnIndex(DbSchema.TrackingTable.Cols.ID));
             String code = getString(getColumnIndex(DbSchema.TrackingTable.Cols.CODE));
             Integer activeI = getInt(getColumnIndex(DbSchema.TrackingTable.Cols.ACTIVE));

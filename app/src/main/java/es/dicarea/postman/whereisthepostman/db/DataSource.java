@@ -4,12 +4,15 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
-import es.dicarea.postman.whereisthepostman.BeanRepository;
 import es.dicarea.postman.whereisthepostman.BeanRepository.StatusItem;
+import es.dicarea.postman.whereisthepostman.BeanRepository.TrackingItem;
 import es.dicarea.postman.whereisthepostman.CustomApp;
+import es.dicarea.postman.whereisthepostman.StatusEnum;
+import es.dicarea.postman.whereisthepostman.db.WrapperRepository.CustomWrapper;
 import es.dicarea.postman.whereisthepostman.db.WrapperRepository.StatusCursorWrapper;
 import es.dicarea.postman.whereisthepostman.db.WrapperRepository.TrackingCursorWrapper;
 
@@ -66,7 +69,7 @@ public class DataSource {
         try {
             if (statusCursor != null && statusCursor.moveToFirst()) {
                 while (!statusCursor.isAfterLast()) {
-                    statusItems.add(statusCursor.getStatus());
+                    statusItems.add(statusCursor.getElement());
                     statusCursor.moveToNext();
                 }
             }
@@ -79,23 +82,24 @@ public class DataSource {
         return statusItems;
     }
 
-    public StatusItem getLastStatus(String code) {
+    public StatusEnum getMaxStatus(String code) {
 
-        String query = "SELECT * FROM " + DbSchema.StatusTable.NAME +
+        String query = "SELECT MAX( " + DbSchema.StatusTable.Cols.STATUS + " ) AS " + DbSchema.StatusTable.Cols.STATUS +
+                " FROM " + DbSchema.StatusTable.NAME +
                 " WHERE " + DbSchema.StatusTable.Cols.CODE + " = ? " +
                 " ORDER BY " + DbSchema.StatusTable.Cols.DATE + " DESC " +
                 " LIMIT 1";
         String[] args = {code};
 
         Cursor cursor = mDatabase.rawQuery(query, args);
-        StatusCursorWrapper statusCursor = new StatusCursorWrapper(cursor);
         try {
-            if (cursor != null && statusCursor.moveToFirst()) {
-                return statusCursor.getStatus();
+            if (cursor != null && cursor.moveToFirst()) {
+                Integer status = cursor.getInt(cursor.getColumnIndex(DbSchema.StatusTable.Cols.STATUS));
+                return StatusEnum.getStatus(status);
             }
         } finally {
-            if (statusCursor != null) {
-                statusCursor.close();
+            if (cursor != null) {
+                cursor.close();
             }
         }
         return null;
@@ -103,21 +107,20 @@ public class DataSource {
 
     //******************** TRACKING *******************
 
-    public List<BeanRepository.TrackingItem> getTrackingList() {
+    public List<TrackingItem> getTrackingList() {
 
         String query = "SELECT * FROM " + DbSchema.TrackingTable.NAME +
                 " WHERE " + DbSchema.TrackingTable.Cols.ACTIVE + " = 1 " +
-                " ORDER BY " + DbSchema.StatusTable.Cols.DATE + " DESC " +
-                " LIMIT 30";
+                " ORDER BY " + DbSchema.TrackingTable.Cols.CODE + " ASC";
 
-        List<BeanRepository.TrackingItem> trackingItems = new ArrayList<>();
+        List<TrackingItem> trackingItems = new ArrayList<>();
 
         Cursor cursor = mDatabase.rawQuery(query, null);
         TrackingCursorWrapper trackingCursor = new TrackingCursorWrapper(cursor);
         try {
             if (trackingCursor != null && trackingCursor.moveToFirst()) {
                 while (!trackingCursor.isAfterLast()) {
-                    trackingItems.add(trackingCursor.getStatus());
+                    trackingItems.add(trackingCursor.getElement());
                     trackingCursor.moveToNext();
                 }
             }
@@ -131,27 +134,37 @@ public class DataSource {
     }
 
     //******************** UTILS *******************
-    private List<T> commonGetListFromCursor(String sql, String[] selectionArgs, List<T> baba ) {
 
-        List<BeanRepository.TrackingItem> trackingItems = new ArrayList<>();
+    private List commonGetListFromCursor(String query, String[] args, Class<? extends CustomWrapper> cElement) {
 
-        Cursor cursor = mDatabase.rawQuery(sql, selectionArgs);
-        // TrackingCursorWrapper trackingCursor = new TrackingCursorWrapper(cursor);
+        List retList = new ArrayList();
+
+        Cursor cursor = mDatabase.rawQuery(query, args);
+        CustomWrapper cursorWrapper = null;
         try {
-            if (cursor != null && cursor.moveToFirst()) {
-                while (!cursor.isAfterLast()) {
-                    cursor
-                    trackingItems.add(trackingCursor.getStatus());
-                    cursor.moveToNext();
+            cursorWrapper = cElement.getConstructor(Cursor.class).newInstance(cursor);
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        }
+        try {
+            if (cursorWrapper != null && cursorWrapper.moveToFirst()) {
+                while (!cursorWrapper.isAfterLast()) {
+                    retList.add(cursorWrapper.getElement());
+                    cursorWrapper.moveToNext();
                 }
             }
         } finally {
-            if (cursor != null) {
-                cursor.close();
+            if (cursorWrapper != null) {
+                cursorWrapper.close();
             }
         }
-
-        return trackingItems;
+        return retList;
     }
 
 }

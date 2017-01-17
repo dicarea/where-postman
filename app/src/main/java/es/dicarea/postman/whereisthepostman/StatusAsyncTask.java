@@ -66,8 +66,9 @@ public class StatusAsyncTask extends AsyncTask<String, Void, List<StatusItem>> {
 
     public boolean checkNotifyRequired(StatusEnum status, String code) {
         DataSource ds = DataSource.getInstance();
-        StatusItem lastStatus = ds.getLastStatus(code);
-        return lastStatus == null || lastStatus.getStatus().getOrder() < status.getOrder();
+        StatusEnum lastStatus = ds.getMaxStatus(code);
+        /* Only notification if status changes to a higher one. */
+        return lastStatus == null || lastStatus.getOrder() < status.getOrder();
     }
 
     public void sendNotification(StatusItem statusItem) {
