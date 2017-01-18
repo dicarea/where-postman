@@ -7,6 +7,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
@@ -29,11 +30,13 @@ public class MainActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
 
+        this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+
+        final EditText codeText = (EditText) findViewById(R.id.code);
         Button clickButton = (Button) findViewById(R.id.code_button);
         clickButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                EditText codeText = (EditText) findViewById(R.id.code);
                 DataSource ds = DataSource.getInstance();
                 BeanRepository.TrackingItem trackingItem = new BeanRepository.TrackingItem();
                 trackingItem.setCode(codeText.getText().toString());
