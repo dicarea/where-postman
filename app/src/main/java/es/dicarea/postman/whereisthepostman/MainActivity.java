@@ -1,5 +1,6 @@
 package es.dicarea.postman.whereisthepostman;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -7,6 +8,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -46,6 +48,17 @@ public class MainActivity extends AppCompatActivity {
         });
 
         ListView listView = (ListView) findViewById(R.id.tracking_list);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener(){
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                String code = (String) adapterView.getItemAtPosition(i);
+
+                Intent intent = new Intent(MainActivity.this, LogActivity.class);
+                intent.putExtra("TRACKING_ID", code);
+                startActivity(intent);
+            }
+        });
+
         DataSource ds = DataSource.getInstance();
         List<BeanRepository.TrackingItem> trackingList = ds.getTrackingList();
         List<String> listCodes = new ArrayList<>(trackingList.size());
@@ -53,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
             listCodes.add(trackingItem.getCode());
         }
         String[] codes = listCodes.toArray(new String[listCodes.size()]);
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
                 android.R.layout.simple_list_item_1, android.R.id.text1, listCodes);
         listView.setAdapter(adapter);
     }
@@ -67,9 +80,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
 
-//        String text = getTextViewContent();
-//        TextView textView = (TextView) this.findViewById(R.id.textInfo);
-//        textView.setText(text);
     }
 
     @Override
@@ -91,23 +101,5 @@ public class MainActivity extends AppCompatActivity {
         inflater.inflate(R.menu.main_menu, menu);
         return true;
     }
-
-    //***********************************
-
-//    private String getTextViewContent() {
-//        DataSource ds = DataSource.getInstance();
-//        List<StatusItem> statusList = ds.getStatusList();
-//
-//        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
-//
-//        StringBuilder sb = new StringBuilder();
-//        for (StatusItem statusItem : statusList) {
-//            String dateStr = sdf.format(statusItem.getTime());
-//            String statusName = statusItem.getStatus().getName();
-//            sb.append(statusItem.getCode() + "\n\t\t" + dateStr + " - " + statusName + "\n");
-//        }
-//
-//        return sb.toString();
-//    }
 
 }

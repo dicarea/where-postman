@@ -22,6 +22,9 @@
             </intent-filter>
         </activity>
         <activity
+            android:name="es.dicarea.postman.whereisthepostman.LogActivity"
+            android:theme="@style/Theme.AppCompat.Light"/>
+        <activity
             android:name="es.dicarea.postman.whereisthepostman.db.AndroidDatabaseManager"
             android:theme="@style/Theme.AppCompat.Light"/>
 

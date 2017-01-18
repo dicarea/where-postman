@@ -48,10 +48,9 @@ public class DataSource {
     public List<StatusItem> getStatusList(Integer trackingId) {
 
         String query = "SELECT * FROM " + DbSchema.StatusTable.NAME +
-                " WHERE " + DbSchema.StatusTable.Cols.TRACKING_ID + " = ? " +
+                " WHERE " + DbSchema.StatusTable.Cols.TRACKING_ID + " = " + trackingId +
                 " ORDER BY " + DbSchema.StatusTable.Cols.DATE + " DESC " +
                 " LIMIT 30";
-        String[] args = {String.valueOf(trackingId)};
 
         Cursor cursor = mDatabase.rawQuery(query, null);
 
@@ -121,10 +120,38 @@ public class DataSource {
         return trackingItems;
     }
 
+    public TrackingItem getTrackingByCode(String code) {
+
+        String query = "SELECT * FROM " + DbSchema.TrackingTable.NAME +
+                " WHERE " + DbSchema.TrackingTable.Cols.CODE + " = '" + code + "'";
+
+        Cursor cursor = mDatabase.rawQuery(query, null);
+        TrackingCursorWrapper trackingCursor = new TrackingCursorWrapper(cursor);
+        try {
+            if (trackingCursor != null && trackingCursor.moveToFirst()) {
+
+                return trackingCursor.getElement();
+            }
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+        return null;
+    }
+
     public void addTracking(TrackingItem trackingItem) {
         ContentValues values = getContentValues(trackingItem);
         long id = mDatabase.insert(DbSchema.TrackingTable.NAME, null, values);
         trackingItem.setId(((int) id));
+    }
+
+    public void updateActiveTracking(TrackingItem trackingItem) {
+        String strSQL = "UPDATE " + DbSchema.TrackingTable.NAME + " " +
+                " SET " + DbSchema.TrackingTable.Cols.ACTIVE + " = " + (trackingItem.getActive() ? 1 : 0) +
+                " WHERE " + DbSchema.TrackingTable.Cols.ID + " = " + trackingItem.getId();
+
+        mDatabase.execSQL(strSQL);
     }
 
     private static ContentValues getContentValues(TrackingItem trackingItem) {
@@ -135,8 +162,5 @@ public class DataSource {
         values.put(DbSchema.TrackingTable.Cols.DELETED, false);
         return values;
     }
-
-    //******************** UTILS *******************
-
 
 }
