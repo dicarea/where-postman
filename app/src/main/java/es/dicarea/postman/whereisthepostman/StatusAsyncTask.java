@@ -16,9 +16,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import es.dicarea.postman.whereisthepostman.BeanRepository.StatusItem;
+import es.dicarea.postman.whereisthepostman.BeanRepository.TrackingItem;
 import es.dicarea.postman.whereisthepostman.db.DataSource;
 
-public class StatusAsyncTask extends AsyncTask<String, Void, List<StatusItem>> {
+public class StatusAsyncTask extends AsyncTask<TrackingItem, Void, List<StatusItem>> {
 
     private static final String URL = "http://aplicacionesweb.correos.es/localizadorenvios/track.asp?accion=LocalizaUno&numero=";
     private long timeNow;
@@ -29,20 +30,20 @@ public class StatusAsyncTask extends AsyncTask<String, Void, List<StatusItem>> {
     }
 
     @Override
-    protected List<StatusItem> doInBackground(String... strings) {
+    protected List<StatusItem> doInBackground(TrackingItem... items) {
 
         List<StatusItem> notifyList = new ArrayList<>();
 
-        for (String code : strings) {
-            StatusEnum status = findStatus(code);
-            if (checkNotifyRequired(status, code)) {
+        for (TrackingItem tracking : items) {
+            StatusEnum status = findStatus(tracking);
+            if (checkNotifyRequired(status, tracking.getId())) {
                 StatusItem statusItem = new StatusItem();
-                statusItem.setCode(code);
+                statusItem.setTracking(tracking);
                 statusItem.setTime(timeNow);
                 statusItem.setStatus(status);
                 notifyList.add(statusItem);
             }
-            storeStatus(status, code);
+            storeStatus(status, tracking.getId());
         }
 
         return notifyList;
@@ -55,18 +56,20 @@ public class StatusAsyncTask extends AsyncTask<String, Void, List<StatusItem>> {
         }
     }
 
-    private void storeStatus(StatusEnum statusEnum, String code) {
+    private void storeStatus(StatusEnum statusEnum, Integer trackingId) {
         DataSource dataSource = DataSource.getInstance();
         StatusItem statusItem = new StatusItem();
         statusItem.setTime(timeNow);
         statusItem.setStatus(statusEnum);
-        statusItem.setCode(code);
+        TrackingItem tracking = new TrackingItem();
+        tracking.setId(trackingId);
+        statusItem.setTracking(tracking);
         dataSource.addStatus(statusItem);
     }
 
-    public boolean checkNotifyRequired(StatusEnum status, String code) {
+    public boolean checkNotifyRequired(StatusEnum status, Integer trackingId) {
         DataSource ds = DataSource.getInstance();
-        StatusEnum lastStatus = ds.getMaxStatus(code);
+        StatusEnum lastStatus = ds.getMaxStatus(trackingId);
         /* Only notification if status changes to a higher one. */
         return lastStatus == null || lastStatus.getOrder() < status.getOrder();
     }
@@ -81,15 +84,15 @@ public class StatusAsyncTask extends AsyncTask<String, Void, List<StatusItem>> {
 
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(context).setSmallIcon(android.R.drawable.ic_dialog_alert)
-                        .setContentTitle(statusItem.getCode()).setContentText(line).setDefaults(Notification.DEFAULT_SOUND);
+                        .setContentTitle(statusItem.getTracking().getCode()).setContentText(line).setDefaults(Notification.DEFAULT_SOUND);
 
         NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         mNotificationManager.notify(statusItem.getStatus().getOrder(), mBuilder.build());
     }
 
-    private StatusEnum findStatus(String code) {
+    private StatusEnum findStatus(BeanRepository.TrackingItem tracking) {
         try {
-            Document doc = Jsoup.connect(URL + code).get();
+            Document doc = Jsoup.connect(URL + tracking.getCode()).get();
             Elements elements = doc.select("span.txtNormal");
             if (elements != null && elements.size() > 0) {
                 String statusStr = elements.get(elements.size() - 1).text().trim();

@@ -4,7 +4,6 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,7 +11,6 @@ import es.dicarea.postman.whereisthepostman.BeanRepository.StatusItem;
 import es.dicarea.postman.whereisthepostman.BeanRepository.TrackingItem;
 import es.dicarea.postman.whereisthepostman.CustomApp;
 import es.dicarea.postman.whereisthepostman.StatusEnum;
-import es.dicarea.postman.whereisthepostman.db.WrapperRepository.CustomWrapper;
 import es.dicarea.postman.whereisthepostman.db.WrapperRepository.StatusCursorWrapper;
 import es.dicarea.postman.whereisthepostman.db.WrapperRepository.TrackingCursorWrapper;
 
@@ -35,9 +33,9 @@ public class DataSource {
     private static ContentValues getContentValues(StatusItem statusItem) {
         ContentValues values = new ContentValues();
         values.put(DbSchema.StatusTable.Cols.ID, statusItem.getId());
+        values.put(DbSchema.StatusTable.Cols.TRACKING_ID, statusItem.getTracking().getId());
         values.put(DbSchema.StatusTable.Cols.DATE, statusItem.getTime());
         values.put(DbSchema.StatusTable.Cols.STATUS, statusItem.getStatus().getOrder());
-        values.put(DbSchema.StatusTable.Cols.CODE, statusItem.getCode());
         return values;
     }
 
@@ -47,24 +45,17 @@ public class DataSource {
         statusItem.setId(((int) id));
     }
 
-    public void deleteStatus(StatusItem statusItem) {
-        mDatabase.delete(DbSchema.StatusTable.NAME, DbSchema.StatusTable.Cols.ID + " = ?", new String[]{statusItem.getId().toString()});
-    }
-
-    private void updateStatus(StatusItem statusItem) {
-        ContentValues values = getContentValues(statusItem);
-        mDatabase.update(DbSchema.StatusTable.NAME, values, DbSchema.StatusTable.Cols.ID + " = " + statusItem.getId(), null);
-    }
-
-    public List<StatusItem> getStatusList() {
+    public List<StatusItem> getStatusList(Integer trackingId) {
 
         String query = "SELECT * FROM " + DbSchema.StatusTable.NAME +
+                " WHERE " + DbSchema.StatusTable.Cols.TRACKING_ID + " = ? " +
                 " ORDER BY " + DbSchema.StatusTable.Cols.DATE + " DESC " +
                 " LIMIT 30";
-
-        List<StatusItem> statusItems = new ArrayList<>();
+        String[] args = {String.valueOf(trackingId)};
 
         Cursor cursor = mDatabase.rawQuery(query, null);
+
+        List<StatusItem> statusItems = new ArrayList<>();
         StatusCursorWrapper statusCursor = new StatusCursorWrapper(cursor);
         try {
             if (statusCursor != null && statusCursor.moveToFirst()) {
@@ -82,16 +73,13 @@ public class DataSource {
         return statusItems;
     }
 
-    public StatusEnum getMaxStatus(String code) {
+    public StatusEnum getMaxStatus(Integer trackingId) {
 
         String query = "SELECT MAX( " + DbSchema.StatusTable.Cols.STATUS + " ) AS " + DbSchema.StatusTable.Cols.STATUS +
                 " FROM " + DbSchema.StatusTable.NAME +
-                " WHERE " + DbSchema.StatusTable.Cols.CODE + " = ? " +
-                " ORDER BY " + DbSchema.StatusTable.Cols.DATE + " DESC " +
-                " LIMIT 1";
-        String[] args = {code};
+                " WHERE " + DbSchema.StatusTable.Cols.TRACKING_ID + " = " + trackingId;
 
-        Cursor cursor = mDatabase.rawQuery(query, args);
+        Cursor cursor = mDatabase.rawQuery(query, null);
         try {
             if (cursor != null && cursor.moveToFirst()) {
                 Integer status = cursor.getInt(cursor.getColumnIndex(DbSchema.StatusTable.Cols.STATUS));
@@ -133,38 +121,22 @@ public class DataSource {
         return trackingItems;
     }
 
+    public void addTracking(TrackingItem trackingItem) {
+        ContentValues values = getContentValues(trackingItem);
+        long id = mDatabase.insert(DbSchema.TrackingTable.NAME, null, values);
+        trackingItem.setId(((int) id));
+    }
+
+    private static ContentValues getContentValues(TrackingItem trackingItem) {
+        ContentValues values = new ContentValues();
+        values.put(DbSchema.TrackingTable.Cols.ID, trackingItem.getId());
+        values.put(DbSchema.TrackingTable.Cols.CODE, trackingItem.getCode());
+        values.put(DbSchema.TrackingTable.Cols.ACTIVE, true);
+        values.put(DbSchema.TrackingTable.Cols.DELETED, false);
+        return values;
+    }
+
     //******************** UTILS *******************
 
-    private List commonGetListFromCursor(String query, String[] args, Class<? extends CustomWrapper> cElement) {
-
-        List retList = new ArrayList();
-
-        Cursor cursor = mDatabase.rawQuery(query, args);
-        CustomWrapper cursorWrapper = null;
-        try {
-            cursorWrapper = cElement.getConstructor(Cursor.class).newInstance(cursor);
-        } catch (InstantiationException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-        }
-        try {
-            if (cursorWrapper != null && cursorWrapper.moveToFirst()) {
-                while (!cursorWrapper.isAfterLast()) {
-                    retList.add(cursorWrapper.getElement());
-                    cursorWrapper.moveToNext();
-                }
-            }
-        } finally {
-            if (cursorWrapper != null) {
-                cursorWrapper.close();
-            }
-        }
-        return retList;
-    }
 
 }

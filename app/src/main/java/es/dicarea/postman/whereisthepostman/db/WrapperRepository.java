@@ -9,15 +9,7 @@ import es.dicarea.postman.whereisthepostman.StatusEnum;
 
 public class WrapperRepository {
 
-    public abstract static class CustomWrapper<T> extends CursorWrapper {
-        public CustomWrapper(Cursor cursor) {
-            super(cursor);
-        }
-
-        public abstract T getElement();
-    }
-
-    public static class StatusCursorWrapper extends CustomWrapper {
+    public static class StatusCursorWrapper extends CursorWrapper {
 
         public StatusCursorWrapper(Cursor cursor) {
             super(cursor);
@@ -27,20 +19,23 @@ public class WrapperRepository {
             Integer id = getInt(getColumnIndex(DbSchema.StatusTable.Cols.ID));
             Long time = getLong(getColumnIndex(DbSchema.StatusTable.Cols.DATE));
             Integer status = getInt(getColumnIndex(DbSchema.StatusTable.Cols.STATUS));
-            String code = getString(getColumnIndex(DbSchema.StatusTable.Cols.CODE));
+            Integer trackingId = getInt(getColumnIndex(DbSchema.StatusTable.Cols.TRACKING_ID));
 
             StatusItem statusItem = new StatusItem();
             statusItem.setId(id);
             statusItem.setTime(time);
             statusItem.setStatus(StatusEnum.getStatus(status));
-            statusItem.setCode(code);
+
+            TrackingItem tracking = new TrackingItem();
+            tracking.setId(trackingId);
+            statusItem.setTracking(tracking);
 
             return statusItem;
         }
 
     }
 
-    public static class TrackingCursorWrapper extends CustomWrapper {
+    public static class TrackingCursorWrapper extends CursorWrapper {
 
         public TrackingCursorWrapper(Cursor cursor) {
             super(cursor);
