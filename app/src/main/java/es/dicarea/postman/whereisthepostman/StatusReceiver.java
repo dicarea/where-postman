@@ -21,7 +21,7 @@ public class StatusReceiver extends android.content.BroadcastReceiver {
 
     private TrackingItem[] getCodes() {
         DataSource ds = DataSource.getInstance();
-        List<TrackingItem> trackingList = ds.getTrackingList();
+        List<TrackingItem> trackingList = ds.getTrackingListActive();
         return trackingList.toArray(new TrackingItem[trackingList.size()]);
     }
 

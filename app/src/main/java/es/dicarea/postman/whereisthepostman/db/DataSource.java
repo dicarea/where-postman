@@ -94,10 +94,37 @@ public class DataSource {
 
     //******************** TRACKING *******************
 
-    public List<TrackingItem> getTrackingList() {
+    public List<TrackingItem> getTrackingListActive() {
 
         String query = "SELECT * FROM " + DbSchema.TrackingTable.NAME +
                 " WHERE " + DbSchema.TrackingTable.Cols.ACTIVE + " = 1 " +
+                " AND " + DbSchema.TrackingTable.Cols.DELETED + " = 0 " +
+                " ORDER BY " + DbSchema.TrackingTable.Cols.CODE + " ASC";
+
+        List<TrackingItem> trackingItems = new ArrayList<>();
+
+        Cursor cursor = mDatabase.rawQuery(query, null);
+        TrackingCursorWrapper trackingCursor = new TrackingCursorWrapper(cursor);
+        try {
+            if (trackingCursor != null && trackingCursor.moveToFirst()) {
+                while (!trackingCursor.isAfterLast()) {
+                    trackingItems.add(trackingCursor.getElement());
+                    trackingCursor.moveToNext();
+                }
+            }
+        } finally {
+            if (trackingCursor != null) {
+                trackingCursor.close();
+            }
+        }
+
+        return trackingItems;
+    }
+
+    public List<TrackingItem> getTrackingList() {
+
+        String query = "SELECT * FROM " + DbSchema.TrackingTable.NAME +
+                " WHERE " + DbSchema.TrackingTable.Cols.DELETED + " = 0 " +
                 " ORDER BY " + DbSchema.TrackingTable.Cols.CODE + " ASC";
 
         List<TrackingItem> trackingItems = new ArrayList<>();

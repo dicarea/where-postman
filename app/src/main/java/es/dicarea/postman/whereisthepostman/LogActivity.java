@@ -18,11 +18,12 @@ public class LogActivity extends AppCompatActivity {
         setContentView(R.layout.activity_log);
 
         Intent intent = getIntent();
-        String code = intent.getStringExtra("TRACKING_ID");
+        Integer trackingId = intent.getIntExtra("TRACKING_ID", 0);
+        String trackingCode = intent.getStringExtra("TRACKING_CODE");
 
-        this.setTitle(code);
+        this.setTitle(trackingCode);
 
-        String text = getTextViewContent(code);
+        String text = getTextViewContent(trackingId);
         TextView textView = (TextView) this.findViewById(R.id.textInfo);
         textView.setText(text);
     }
@@ -45,10 +46,9 @@ public class LogActivity extends AppCompatActivity {
 
     //***********************************
 
-    private String getTextViewContent(String code) {
+    private String getTextViewContent(Integer trackingId) {
         DataSource ds = DataSource.getInstance();
-        BeanRepository.TrackingItem tracking = ds.getTrackingByCode(code);
-        List<BeanRepository.StatusItem> statusList = ds.getStatusList(tracking.getId());
+        List<BeanRepository.StatusItem> statusList = ds.getStatusList(trackingId);
 
         SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
 
