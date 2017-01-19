@@ -44,6 +44,7 @@ public class BeanRepository {
     public static class TrackingItem {
         private Integer mId;
         private String mCode;
+        private String mDesc;
         private Boolean mActive;
         private Boolean mDeleted;
         private StatusItem mLastStatus;
@@ -87,6 +88,14 @@ public class BeanRepository {
 
         public void setLastStatus(StatusItem lastStatus) {
             mLastStatus = lastStatus;
+        }
+
+        public String getDesc() {
+            return mDesc;
+        }
+
+        public void setDesc(String desc) {
+            mDesc = desc;
         }
     }
 }

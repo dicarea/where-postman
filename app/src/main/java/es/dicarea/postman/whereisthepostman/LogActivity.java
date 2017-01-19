@@ -1,29 +1,33 @@
 package es.dicarea.postman.whereisthepostman;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.widget.TextView;
 
 import java.text.SimpleDateFormat;
 import java.util.List;
 
+import es.dicarea.postman.whereisthepostman.BeanRepository.TrackingItem;
 import es.dicarea.postman.whereisthepostman.db.DataSource;
 
 public class LogActivity extends AppCompatActivity {
+
+    private TrackingItem tracking;
+    private final DataSource ds = DataSource.getInstance();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_log);
 
-        Intent intent = getIntent();
-        Integer trackingId = intent.getIntExtra("TRACKING_ID", 0);
-        String trackingCode = intent.getStringExtra("TRACKING_CODE");
+        tracking = ds.getTrackingById(getIntent().getIntExtra("TRACKING_ID", 0));
 
-        this.setTitle(trackingCode);
+        this.setTitle(tracking.getCode());
 
-        String text = getTextViewContent(trackingId);
+        String text = getTextViewContent(tracking.getId());
         TextView textView = (TextView) this.findViewById(R.id.textInfo);
         textView.setText(text);
     }
@@ -44,13 +48,33 @@ public class LogActivity extends AppCompatActivity {
         super.onResume();
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_log_delete:
+                ds.deleteStatusByTracking(tracking.getId());
+                ds.deleteTracking(tracking);
+                this.finish();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.log_menu, menu);
+        return true;
+    }
+
     //***********************************
 
     private String getTextViewContent(Integer trackingId) {
         DataSource ds = DataSource.getInstance();
         List<BeanRepository.StatusItem> statusList = ds.getStatusList(trackingId);
 
-        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
 
         StringBuilder sb = new StringBuilder();
         for (BeanRepository.StatusItem statusItem : statusList) {

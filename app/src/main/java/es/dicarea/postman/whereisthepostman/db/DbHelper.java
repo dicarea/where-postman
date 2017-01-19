@@ -1,6 +1,5 @@
 package es.dicarea.postman.whereisthepostman.db;
 
-import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.MatrixCursor;
@@ -32,17 +31,12 @@ public class DbHelper extends SQLiteOpenHelper {
         db.execSQL("create table " + DbSchema.TrackingTable.NAME + "(" +
                 DbSchema.TrackingTable.Cols.ID + " integer primary key autoincrement, " +
                 DbSchema.TrackingTable.Cols.CODE + ", " +
+                DbSchema.TrackingTable.Cols.DESC + ", " +
                 DbSchema.TrackingTable.Cols.ACTIVE + ", " +
                 DbSchema.TrackingTable.Cols.DELETED +
                 ")"
         );
 
-        ContentValues values = new ContentValues();
-        values.put(DbSchema.TrackingTable.Cols.CODE, "PQ4F6P0703142520133205G");
-        values.put(DbSchema.TrackingTable.Cols.ACTIVE, true);
-        values.put(DbSchema.TrackingTable.Cols.DELETED, false);
-
-        db.insert(DbSchema.TrackingTable.NAME, null, values);
     }
 
     @Override

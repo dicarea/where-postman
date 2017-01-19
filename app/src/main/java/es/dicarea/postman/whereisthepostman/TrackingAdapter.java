@@ -36,7 +36,6 @@ public class TrackingAdapter extends ArrayAdapter<TrackingItem> {
             public void onClick(View view) {
                 Intent intent = new Intent(mContext, LogActivity.class);
                 intent.putExtra("TRACKING_ID", trackingItem.getId());
-                intent.putExtra("TRACKING_CODE", trackingItem.getCode());
                 mContext.startActivity(intent);
             }
         });

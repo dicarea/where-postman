@@ -2,7 +2,9 @@ package es.dicarea.postman.whereisthepostman;
 
 import android.app.Notification;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.v4.app.NotificationCompat;
 
@@ -82,12 +84,22 @@ public class StatusAsyncTask extends AsyncTask<TrackingItem, Void, List<StatusIt
         String now = dateFormat.format(statusItem.getTime());
         String line = now + " -> " + statusItem.getStatus().getName();
 
-        NotificationCompat.Builder mBuilder =
-                new NotificationCompat.Builder(context).setSmallIcon(android.R.drawable.ic_dialog_alert)
-                        .setContentTitle(statusItem.getTracking().getCode()).setContentText(line).setDefaults(Notification.DEFAULT_SOUND);
+        Intent myIntent = new Intent(context, MainActivity.class);
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, myIntent, 0);
 
-        NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        mNotificationManager.notify(statusItem.getStatus().getOrder(), mBuilder.build());
+        Notification myNotification = new NotificationCompat.Builder(context)
+                .setContentTitle(statusItem.getTracking().getCode())
+                .setContentText(line)
+                .setWhen(System.currentTimeMillis())
+                .setContentIntent(pendingIntent)
+                .setDefaults(Notification.DEFAULT_SOUND)
+                .setAutoCancel(true)
+                .setSmallIcon(android.R.drawable.ic_dialog_alert)
+                .build();
+
+        NotificationManager notificationManager =
+                (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.notify(statusItem.getStatus().getOrder(), myNotification);
     }
 
     private StatusEnum findStatus(BeanRepository.TrackingItem tracking) {

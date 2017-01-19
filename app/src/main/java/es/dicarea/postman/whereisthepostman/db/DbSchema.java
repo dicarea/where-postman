@@ -18,6 +18,7 @@ public class DbSchema {
         public static final class Cols {
             public static final String ID = "id";
             public static final String CODE = "code";
+            public static final String DESC = "desc";
             public static final String ACTIVE = "active";
             public static final String DELETED = "deleted";
         }

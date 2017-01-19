@@ -92,6 +92,13 @@ public class DataSource {
         return null;
     }
 
+    public void deleteStatusByTracking(Integer idTracking) {
+        String strSQL = "DELETE FROM " + DbSchema.StatusTable.NAME + " " +
+                " WHERE " + DbSchema.StatusTable.Cols.TRACKING_ID + " = " + idTracking;
+
+        mDatabase.execSQL(strSQL);
+    }
+
     //******************** TRACKING *******************
 
     public List<TrackingItem> getTrackingListActive() {
@@ -147,6 +154,25 @@ public class DataSource {
         return trackingItems;
     }
 
+    public TrackingItem getTrackingById(Integer idTracking) {
+        String query = "SELECT * FROM " + DbSchema.TrackingTable.NAME +
+                " WHERE " + DbSchema.TrackingTable.Cols.ID + " = " + idTracking;
+
+        Cursor cursor = mDatabase.rawQuery(query, null);
+        TrackingCursorWrapper trackingCursor = new TrackingCursorWrapper(cursor);
+        try {
+            if (trackingCursor != null && trackingCursor.moveToFirst()) {
+
+                return trackingCursor.getElement();
+            }
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+        return null;
+    }
+
     public TrackingItem getTrackingByCode(String code) {
 
         String query = "SELECT * FROM " + DbSchema.TrackingTable.NAME +
@@ -181,10 +207,18 @@ public class DataSource {
         mDatabase.execSQL(strSQL);
     }
 
+    public void deleteTracking(TrackingItem tracking) {
+        String strSQL = "DELETE FROM " + DbSchema.TrackingTable.NAME + " " +
+                " WHERE " + DbSchema.TrackingTable.Cols.ID + " = " + tracking.getId();
+
+        mDatabase.execSQL(strSQL);
+    }
+
     private static ContentValues getContentValues(TrackingItem trackingItem) {
         ContentValues values = new ContentValues();
         values.put(DbSchema.TrackingTable.Cols.ID, trackingItem.getId());
         values.put(DbSchema.TrackingTable.Cols.CODE, trackingItem.getCode());
+        values.put(DbSchema.TrackingTable.Cols.DESC, trackingItem.getDesc());
         values.put(DbSchema.TrackingTable.Cols.ACTIVE, true);
         values.put(DbSchema.TrackingTable.Cols.DELETED, false);
         return values;

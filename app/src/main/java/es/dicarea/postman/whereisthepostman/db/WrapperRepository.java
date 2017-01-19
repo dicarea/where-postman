@@ -44,12 +44,14 @@ public class WrapperRepository {
         public TrackingItem getElement() {
             Integer id = getInt(getColumnIndex(DbSchema.TrackingTable.Cols.ID));
             String code = getString(getColumnIndex(DbSchema.TrackingTable.Cols.CODE));
+            String desc = getString(getColumnIndex(DbSchema.TrackingTable.Cols.DESC));
             Integer activeI = getInt(getColumnIndex(DbSchema.TrackingTable.Cols.ACTIVE));
             Integer deletedI = getInt(getColumnIndex(DbSchema.TrackingTable.Cols.DELETED));
 
             TrackingItem trackingItem = new TrackingItem();
             trackingItem.setId(id);
             trackingItem.setCode(code);
+            trackingItem.setDesc(desc);
             trackingItem.setActive(activeI != null && activeI != 0);
             trackingItem.setDeleted(deletedI != null && deletedI != 0);
 
