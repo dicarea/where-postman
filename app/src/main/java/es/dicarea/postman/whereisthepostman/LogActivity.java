@@ -23,6 +23,8 @@ public class LogActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_log);
 
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
         tracking = ds.getTrackingById(getIntent().getIntExtra("TRACKING_ID", 0));
 
         this.setTitle(tracking.getCode());

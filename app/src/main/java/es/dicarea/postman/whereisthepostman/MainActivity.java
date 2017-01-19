@@ -8,7 +8,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -19,6 +18,8 @@ import es.dicarea.postman.whereisthepostman.db.AndroidDatabaseManager;
 import es.dicarea.postman.whereisthepostman.db.DataSource;
 
 public class MainActivity extends AppCompatActivity {
+
+    private ListView listView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,10 +43,16 @@ public class MainActivity extends AppCompatActivity {
                 trackingItem.setCode(codeText.getText().toString());
                 ds.addTracking(trackingItem);
                 codeText.getText().clear();
+                refreshList();
             }
         });
 
-        ListView listView = (ListView) findViewById(R.id.tracking_list);
+        listView = (ListView) findViewById(R.id.tracking_list);
+        refreshList();
+    }
+
+    private void refreshList() {
+        listView = (ListView) findViewById(R.id.tracking_list);
         DataSource ds = DataSource.getInstance();
         List<BeanRepository.TrackingItem> trackingList = ds.getTrackingList();
         TrackingAdapter adapter = new TrackingAdapter(this, trackingList);

@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:app="http://schemas.android.com/apk/res-auto"
+      xmlns:tools="http://schemas.android.com/tools"
+      tools:context=".MainActivity">
     <item
         android:id="@+id/action_tracking"
-        android:icon="@android:drawable/ic_input_add"
-        android:orderInCategory="100"
-        android:showAsAction="ifRoom"
-        android:title="Tracking"/>
+        android:icon="@android:drawable/ic_menu_manage"
+        android:title="Tracking"
+        app:showAsAction="ifRoom"/>
 </menu>
