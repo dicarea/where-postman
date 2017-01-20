@@ -39,6 +39,8 @@ public class TrackingAdapter extends ArrayAdapter<TrackingItem> {
                 mContext.startActivity(intent);
             }
         });
+        TextView descText = (TextView) convertView.findViewById(R.id.code_desc);
+        descText.setText(trackingItem.getDesc());
 
         CheckBox codeCb = (CheckBox) convertView.findViewById(R.id.code_enabled);
         codeCb.setChecked(trackingItem.getActive());

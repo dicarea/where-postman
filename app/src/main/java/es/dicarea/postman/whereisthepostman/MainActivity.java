@@ -1,5 +1,6 @@
 package es.dicarea.postman.whereisthepostman;
 
+import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -14,6 +15,7 @@ import android.widget.ListView;
 
 import java.util.List;
 
+import es.dicarea.postman.whereisthepostman.BeanRepository.TrackingItem;
 import es.dicarea.postman.whereisthepostman.db.AndroidDatabaseManager;
 import es.dicarea.postman.whereisthepostman.db.DataSource;
 
@@ -33,28 +35,15 @@ public class MainActivity extends AppCompatActivity {
 
         this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
-        final EditText codeText = (EditText) findViewById(R.id.code);
-        Button clickButton = (Button) findViewById(R.id.code_button);
-        clickButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                DataSource ds = DataSource.getInstance();
-                BeanRepository.TrackingItem trackingItem = new BeanRepository.TrackingItem();
-                trackingItem.setCode(codeText.getText().toString());
-                ds.addTracking(trackingItem);
-                codeText.getText().clear();
-                refreshList();
-            }
-        });
-
         listView = (ListView) findViewById(R.id.tracking_list);
+
         refreshList();
     }
 
     private void refreshList() {
         listView = (ListView) findViewById(R.id.tracking_list);
         DataSource ds = DataSource.getInstance();
-        List<BeanRepository.TrackingItem> trackingList = ds.getTrackingList();
+        List<TrackingItem> trackingList = ds.getTrackingList();
         TrackingAdapter adapter = new TrackingAdapter(this, trackingList);
         listView.setAdapter(adapter);
     }
@@ -73,12 +62,40 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            case R.id.action_add:
+                final Dialog commentDialog = new Dialog(this);
+                commentDialog.setContentView(R.layout.modal_new);
+                commentDialog.setTitle("New Tracking");
+                Button okBtn = (Button) commentDialog.findViewById(R.id.ok);
+                okBtn.setOnClickListener(new View.OnClickListener() {
+
+                    @Override
+                    public void onClick(View v) {
+                        DataSource ds = DataSource.getInstance();
+                        TrackingItem trackingItem = new TrackingItem();
+                        EditText code = (EditText) commentDialog.findViewById(R.id.modal_tracking);
+                        EditText desc = (EditText) commentDialog.findViewById(R.id.modal_desc);
+                        trackingItem.setCode(code.getText().toString());
+                        trackingItem.setDesc(desc.getText().toString());
+                        ds.addTracking(trackingItem);
+                        refreshList();
+                        commentDialog.dismiss();
+                    }
+                });
+                Button cancelBtn = (Button) commentDialog.findViewById(R.id.cancel);
+                cancelBtn.setOnClickListener(new View.OnClickListener() {
+
+                    @Override
+                    public void onClick(View v) {
+                        commentDialog.dismiss();
+                    }
+                });
+                commentDialog.show();
+                return true;
             case R.id.action_tracking:
                 startActivity(new Intent(MainActivity.this, AndroidDatabaseManager.class));
                 return true;
             default:
-                // If we got here, the user's action was not recognized.
-                // Invoke the superclass to handle it.
                 return super.onOptionsItemSelected(item);
         }
     }
