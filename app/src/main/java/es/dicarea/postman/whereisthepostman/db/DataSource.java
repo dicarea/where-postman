@@ -74,7 +74,7 @@ public class DataSource {
 
     public StatusEnum getLastValidStatus(Integer trackingId) {
 
-        String query = "SELECT " + DbSchema.StatusTable.Cols.STATUS + " ) " +
+        String query = "SELECT " + DbSchema.StatusTable.Cols.STATUS +
                 " FROM " + DbSchema.StatusTable.NAME +
                 " WHERE " + DbSchema.StatusTable.Cols.TRACKING_ID + " = " + trackingId +
                 " AND " + DbSchema.StatusTable.Cols.STATUS + " != 0 " +
