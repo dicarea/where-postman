@@ -72,11 +72,14 @@ public class DataSource {
         return statusItems;
     }
 
-    public StatusEnum getMaxStatus(Integer trackingId) {
+    public StatusEnum getLastValidStatus(Integer trackingId) {
 
-        String query = "SELECT MAX( " + DbSchema.StatusTable.Cols.STATUS + " ) AS " + DbSchema.StatusTable.Cols.STATUS +
+        String query = "SELECT " + DbSchema.StatusTable.Cols.STATUS + " ) " +
                 " FROM " + DbSchema.StatusTable.NAME +
-                " WHERE " + DbSchema.StatusTable.Cols.TRACKING_ID + " = " + trackingId;
+                " WHERE " + DbSchema.StatusTable.Cols.TRACKING_ID + " = " + trackingId +
+                " AND " + DbSchema.StatusTable.Cols.STATUS + " != 0 " +
+                " ORDER BY " + DbSchema.StatusTable.Cols.DATE + " DESC " +
+                " LIMIT 1 ";
 
         Cursor cursor = mDatabase.rawQuery(query, null);
         try {

@@ -71,7 +71,7 @@ public class StatusAsyncTask extends AsyncTask<TrackingItem, Void, List<StatusIt
 
     public boolean checkNotifyRequired(StatusEnum status, Integer trackingId) {
         DataSource ds = DataSource.getInstance();
-        StatusEnum lastStatus = ds.getMaxStatus(trackingId);
+        StatusEnum lastStatus = ds.getLastValidStatus(trackingId);
         /* Only notification if status changes to a higher one. */
         return lastStatus == null || lastStatus.getOrder() < status.getOrder();
     }
