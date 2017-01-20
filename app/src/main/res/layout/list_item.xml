@@ -18,6 +18,7 @@
     </FrameLayout>
 
     <FrameLayout
+        android:id="@+id/text_zone"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_toLeftOf="@id/code_enabled_parent">

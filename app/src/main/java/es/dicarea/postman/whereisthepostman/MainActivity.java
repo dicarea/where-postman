@@ -1,7 +1,6 @@
 package es.dicarea.postman.whereisthepostman;
 
 import android.app.Dialog;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
@@ -16,7 +15,6 @@ import android.widget.ListView;
 import java.util.List;
 
 import es.dicarea.postman.whereisthepostman.BeanRepository.TrackingItem;
-import es.dicarea.postman.whereisthepostman.db.AndroidDatabaseManager;
 import es.dicarea.postman.whereisthepostman.db.DataSource;
 
 public class MainActivity extends AppCompatActivity {
@@ -32,8 +30,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-
-        this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
         listView = (ListView) findViewById(R.id.tracking_list);
 
@@ -56,7 +52,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-
     }
 
     @Override
@@ -91,9 +86,6 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
                 commentDialog.show();
-                return true;
-            case R.id.action_tracking:
-                startActivity(new Intent(MainActivity.this, AndroidDatabaseManager.class));
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

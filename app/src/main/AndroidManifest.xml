@@ -25,9 +25,6 @@
             android:name="es.dicarea.postman.whereisthepostman.LogActivity"
             android:parentActivityName=".MainActivity"
             android:theme="@style/AppTheme"/>
-        <activity
-            android:name="es.dicarea.postman.whereisthepostman.db.AndroidDatabaseManager"
-            android:theme="@style/Theme.AppCompat.Light"/>
 
         <receiver android:name="es.dicarea.postman.whereisthepostman.StatusReceiver"/>
     </application>

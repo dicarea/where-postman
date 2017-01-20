@@ -199,6 +199,11 @@ public class DataSource {
         trackingItem.setId(((int) id));
     }
 
+    public void updateTracking(TrackingItem trackingItem) {
+        ContentValues values = getContentValues(trackingItem);
+        mDatabase.update(DbSchema.TrackingTable.NAME, values, DbSchema.TrackingTable.Cols.ID + " =  " + trackingItem.getId(), null);
+    }
+
     public void updateActiveTracking(TrackingItem trackingItem) {
         String strSQL = "UPDATE " + DbSchema.TrackingTable.NAME + " " +
                 " SET " + DbSchema.TrackingTable.Cols.ACTIVE + " = " + (trackingItem.getActive() ? 1 : 0) +

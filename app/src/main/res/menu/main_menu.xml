@@ -8,9 +8,4 @@
         android:icon="@android:drawable/ic_menu_add"
         android:title="Add"
         app:showAsAction="ifRoom"/>
-    <item
-        android:id="@+id/action_tracking"
-        android:icon="@android:drawable/ic_menu_manage"
-        android:title="Tracking"
-        app:showAsAction="ifRoom"/>
 </menu>

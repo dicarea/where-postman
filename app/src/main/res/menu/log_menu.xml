@@ -4,8 +4,18 @@
       xmlns:tools="http://schemas.android.com/tools"
       tools:context=".LogActivity">
     <item
+        android:id="@+id/menu_log_edit"
+        android:icon="@android:drawable/ic_menu_edit"
+        android:title="Edit Tracking"
+        app:showAsAction="never"/>
+    <item
         android:id="@+id/menu_log_delete"
-        android:icon="@android:drawable/ic_delete"
-        android:title="Delete"
-        app:showAsAction="ifRoom"/>
+        android:icon="@android:drawable/ic_menu_delete"
+        android:title="Delete Tracking"
+        app:showAsAction="never"/>
+    <item
+        android:id="@+id/menu_log_clear"
+        android:icon="@android:drawable/ic_menu_agenda"
+        android:title="Clear Log"
+        app:showAsAction="never"/>
 </menu>

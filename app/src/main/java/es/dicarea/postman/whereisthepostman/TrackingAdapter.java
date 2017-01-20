@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import java.util.List;
@@ -25,13 +26,18 @@ public class TrackingAdapter extends ArrayAdapter<TrackingItem> {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
+
         final TrackingItem trackingItem = getItem(position);
+
         if (convertView == null) {
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.list_item, parent, false);
         }
+
         TextView codeText = (TextView) convertView.findViewById(R.id.code_text);
         codeText.setText(trackingItem.getCode());
-        codeText.setOnClickListener(new View.OnClickListener() {
+
+        FrameLayout textZone = (FrameLayout) convertView.findViewById(R.id.text_zone);
+        textZone.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(mContext, LogActivity.class);
@@ -39,6 +45,7 @@ public class TrackingAdapter extends ArrayAdapter<TrackingItem> {
                 mContext.startActivity(intent);
             }
         });
+
         TextView descText = (TextView) convertView.findViewById(R.id.code_desc);
         descText.setText(trackingItem.getDesc());
 
