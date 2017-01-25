@@ -36,6 +36,10 @@ public class MainActivity extends AppCompatActivity {
         refreshList();
     }
 
+
+    /**
+     *
+     */
     private void refreshList() {
         listView = (ListView) findViewById(R.id.tracking_list);
         DataSource ds = DataSource.getInstance();
@@ -60,7 +64,6 @@ public class MainActivity extends AppCompatActivity {
             case R.id.action_add:
                 final Dialog commentDialog = new Dialog(this);
                 commentDialog.setContentView(R.layout.modal_new);
-                commentDialog.setTitle("New Tracking");
                 Button okBtn = (Button) commentDialog.findViewById(R.id.ok);
                 okBtn.setOnClickListener(new View.OnClickListener() {
 

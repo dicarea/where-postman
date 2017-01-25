@@ -5,7 +5,7 @@ import android.database.CursorWrapper;
 
 import es.dicarea.postman.whereisthepostman.BeanRepository.StatusItem;
 import es.dicarea.postman.whereisthepostman.BeanRepository.TrackingItem;
-import es.dicarea.postman.whereisthepostman.StatusEnum;
+import es.dicarea.postman.whereisthepostman.StatusCorreosEnum;
 
 public class WrapperRepository {
 
@@ -24,7 +24,7 @@ public class WrapperRepository {
             StatusItem statusItem = new StatusItem();
             statusItem.setId(id);
             statusItem.setTime(time);
-            statusItem.setStatus(StatusEnum.getStatus(status));
+            statusItem.setStatus(StatusCorreosEnum.getStatus(status));
 
             TrackingItem tracking = new TrackingItem();
             tracking.setId(trackingId);

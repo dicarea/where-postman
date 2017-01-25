@@ -1,7 +1,7 @@
 package es.dicarea.postman.whereisthepostman;
 
+import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -9,7 +9,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -36,20 +35,16 @@ public class LogActivity extends AppCompatActivity {
 
         tracking = ds.getTrackingById(getIntent().getIntExtra("TRACKING_ID", 0));
 
-        updateData();
-    }
-
-    public void updateData() {
-        this.setTitle(tracking.getCode());
-
         textView = (TextView) this.findViewById(R.id.textInfo);
+
+        updateTitle(this, tracking);
     }
 
     @Override
     protected void onStart() {
         super.onStart();
 
-        textView.setText(getTextViewContent(tracking.getId()));
+        refreshLog();
     }
 
     @Override
@@ -62,69 +57,22 @@ public class LogActivity extends AppCompatActivity {
         super.onResume();
     }
 
-    private AlertDialog createDialog() {
-        AlertDialog myQuittingDialogBox = new AlertDialog.Builder(this)
-                .setTitle("Warning !!")
-                .setMessage("Delete tracking ?")
-                .setIcon(android.R.drawable.ic_dialog_alert)
-                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int whichButton) {
-                        ds.deleteStatusByTracking(tracking.getId());
-                        ds.deleteTracking(tracking);
-                        dialog.dismiss();
-                        LogActivity.this.finish();
-                    }
-                })
-                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                })
-                .create();
-        return myQuittingDialogBox;
-    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_log_delete:
-                AlertDialog diaBox = createDialog();
-                diaBox.show();
+                showDeleteDialog();
                 return true;
             case R.id.menu_log_clear:
                 ds.deleteStatusByTracking(tracking.getId());
-                textView.setText(getTextViewContent(tracking.getId()));
+                refreshLog();
                 return true;
             case R.id.menu_log_edit:
-                final Dialog commentDialog = new Dialog(this);
-                commentDialog.setContentView(R.layout.modal_edit);
-                commentDialog.setTitle("New Tracking");
-                Button okBtn = (Button) commentDialog.findViewById(R.id.ok);
-                okBtn.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        DataSource ds = DataSource.getInstance();
-                        EditText code = (EditText) commentDialog.findViewById(R.id.modal_tracking);
-                        EditText desc = (EditText) commentDialog.findViewById(R.id.modal_desc);
-                        tracking.setCode(code.getText().toString());
-                        tracking.setDesc(desc.getText().toString());
-                        ds.updateTracking(tracking);
-                        updateData();
-                        commentDialog.dismiss();
-                    }
-                });
-                Button cancelBtn = (Button) commentDialog.findViewById(R.id.cancel);
-                cancelBtn.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        commentDialog.dismiss();
-                    }
-                });
-                EditText code = (EditText) commentDialog.findViewById(R.id.modal_tracking);
-                EditText desc = (EditText) commentDialog.findViewById(R.id.modal_desc);
-                code.setText(tracking.getCode());
-                desc.setText(tracking.getDesc());
-                commentDialog.show();
+                showEditDialog();
+                return true;
+            case R.id.menu_log_force_request:
+                forceStatusReq();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -139,6 +87,53 @@ public class LogActivity extends AppCompatActivity {
     }
 
     //***********************************
+
+    private void showDeleteDialog() {
+        AlertDialog deleteDialog = new AlertDialog.Builder(this)
+                .setTitle(R.string.warning)
+                .setMessage(R.string.delete_ask)
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        ds.deleteStatusByTracking(tracking.getId());
+                        ds.deleteTracking(tracking);
+                        dialog.dismiss();
+                        LogActivity.this.finish();
+                    }
+                }).setNegativeButton(R.string.cancel, null)
+                .create();
+        deleteDialog.show();
+    }
+
+    private void showEditDialog() {
+
+        final View updateLayout = getLayoutInflater().inflate(R.layout.modal_edit, null);
+        final EditText codeDialog = (EditText) updateLayout.findViewById(R.id.modal_tracking);
+        codeDialog.setText(tracking.getCode());
+        final EditText descDialog = (EditText) updateLayout.findViewById(R.id.modal_desc);
+        descDialog.setText(tracking.getDesc());
+
+        AlertDialog editDialog = new AlertDialog.Builder(this)
+                .setView(updateLayout)
+                .setTitle(R.string.update_tracking)
+                .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        DataSource ds = DataSource.getInstance();
+                        tracking.setCode(codeDialog.getText().toString());
+                        tracking.setDesc(descDialog.getText().toString());
+                        ds.updateTracking(tracking);
+                        updateTitle(LogActivity.this, tracking);
+                    }
+                }).setNegativeButton(R.string.cancel, null)
+                .create();
+
+        editDialog.show();
+    }
+
+    private void forceStatusReq() {
+        new StatusReqHelper().executeRequestSync();
+        refreshLog();
+    }
 
     private String getTextViewContent(Integer trackingId) {
         DataSource ds = DataSource.getInstance();
@@ -156,4 +151,11 @@ public class LogActivity extends AppCompatActivity {
         return sb.toString();
     }
 
+    private void refreshLog() {
+        textView.setText(getTextViewContent(tracking.getId()));
+    }
+
+    private void updateTitle(Activity activity, TrackingItem tracking) {
+        activity.setTitle(tracking.getCode());
+    }
 }

@@ -1,5 +1,4 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                xmlns:tools="http://schemas.android.com/tools"
                 android:layout_width="match_parent"
                 android:layout_height="50dp">
 
@@ -33,15 +32,13 @@
                 android:id="@+id/code_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textSize="18sp"
-                tools:text="code test"/>
+                android:textSize="18sp"/>
 
             <TextView
                 android:id="@+id/code_desc"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textSize="12sp"
-                tools:text="description test"/>
+                android:textSize="12sp"/>
         </LinearLayout>
 
     </FrameLayout>

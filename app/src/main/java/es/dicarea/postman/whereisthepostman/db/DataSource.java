@@ -10,7 +10,7 @@ import java.util.List;
 import es.dicarea.postman.whereisthepostman.BeanRepository.StatusItem;
 import es.dicarea.postman.whereisthepostman.BeanRepository.TrackingItem;
 import es.dicarea.postman.whereisthepostman.CustomApp;
-import es.dicarea.postman.whereisthepostman.StatusEnum;
+import es.dicarea.postman.whereisthepostman.StatusCorreosEnum;
 import es.dicarea.postman.whereisthepostman.db.WrapperRepository.StatusCursorWrapper;
 import es.dicarea.postman.whereisthepostman.db.WrapperRepository.TrackingCursorWrapper;
 
@@ -72,7 +72,7 @@ public class DataSource {
         return statusItems;
     }
 
-    public StatusEnum getLastValidStatus(Integer trackingId) {
+    public StatusCorreosEnum getLastValidStatus(Integer trackingId) {
 
         String query = "SELECT " + DbSchema.StatusTable.Cols.STATUS +
                 " FROM " + DbSchema.StatusTable.NAME +
@@ -85,7 +85,7 @@ public class DataSource {
         try {
             if (cursor != null && cursor.moveToFirst()) {
                 Integer status = cursor.getInt(cursor.getColumnIndex(DbSchema.StatusTable.Cols.STATUS));
-                return StatusEnum.getStatus(status);
+                return StatusCorreosEnum.getStatus(status);
             }
         } finally {
             if (cursor != null) {

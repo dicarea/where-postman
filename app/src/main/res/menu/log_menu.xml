@@ -5,17 +5,19 @@
       tools:context=".LogActivity">
     <item
         android:id="@+id/menu_log_edit"
-        android:icon="@android:drawable/ic_menu_edit"
-        android:title="Edit Tracking"
+        android:title="@string/log_edit_tracking"
         app:showAsAction="never"/>
     <item
         android:id="@+id/menu_log_delete"
-        android:icon="@android:drawable/ic_menu_delete"
-        android:title="Delete Tracking"
+        android:title="@string/log_delete_tracking"
         app:showAsAction="never"/>
     <item
         android:id="@+id/menu_log_clear"
-        android:icon="@android:drawable/ic_menu_agenda"
-        android:title="Clear Log"
+        android:title="@string/log_clear_log"
+        app:showAsAction="never"/>
+
+    <item
+        android:id="@+id/menu_log_force_request"
+        android:title="@string/log_force_request"
         app:showAsAction="never"/>
 </menu>

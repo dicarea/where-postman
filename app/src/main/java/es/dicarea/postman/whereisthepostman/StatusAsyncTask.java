@@ -37,7 +37,7 @@ public class StatusAsyncTask extends AsyncTask<TrackingItem, Void, List<StatusIt
         List<StatusItem> notifyList = new ArrayList<>();
 
         for (TrackingItem tracking : items) {
-            StatusEnum status = findStatus(tracking);
+            StatusCorreosEnum status = findStatus(tracking);
             if (checkNotifyRequired(status, tracking.getId())) {
                 StatusItem statusItem = new StatusItem();
                 statusItem.setTracking(tracking);
@@ -58,7 +58,7 @@ public class StatusAsyncTask extends AsyncTask<TrackingItem, Void, List<StatusIt
         }
     }
 
-    private void storeStatus(StatusEnum statusEnum, Integer trackingId) {
+    private void storeStatus(StatusCorreosEnum statusEnum, Integer trackingId) {
         DataSource dataSource = DataSource.getInstance();
         StatusItem statusItem = new StatusItem();
         statusItem.setTime(timeNow);
@@ -69,9 +69,9 @@ public class StatusAsyncTask extends AsyncTask<TrackingItem, Void, List<StatusIt
         dataSource.addStatus(statusItem);
     }
 
-    public boolean checkNotifyRequired(StatusEnum status, Integer trackingId) {
+    public boolean checkNotifyRequired(StatusCorreosEnum status, Integer trackingId) {
         DataSource ds = DataSource.getInstance();
-        StatusEnum lastStatus = ds.getLastValidStatus(trackingId);
+        StatusCorreosEnum lastStatus = ds.getLastValidStatus(trackingId);
         /* Only notification if status changes to a higher one. */
         return lastStatus == null || lastStatus.getOrder() < status.getOrder();
     }
@@ -102,18 +102,18 @@ public class StatusAsyncTask extends AsyncTask<TrackingItem, Void, List<StatusIt
         notificationManager.notify(statusItem.getStatus().getOrder(), myNotification);
     }
 
-    private StatusEnum findStatus(BeanRepository.TrackingItem tracking) {
+    private StatusCorreosEnum findStatus(BeanRepository.TrackingItem tracking) {
         try {
             Document doc = Jsoup.connect(URL + tracking.getCode()).get();
             Elements elements = doc.select("span.txtNormal");
             if (elements != null && elements.size() > 0) {
                 String statusStr = elements.get(elements.size() - 1).text().trim();
-                return StatusEnum.getStatus(statusStr);
+                return StatusCorreosEnum.getStatus(statusStr);
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return StatusEnum.NO_DEFINIDO;
+        return StatusCorreosEnum.NO_DEFINIDO;
     }
 
 }

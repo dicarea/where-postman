@@ -1,6 +1,6 @@
 package es.dicarea.postman.whereisthepostman;
 
-public enum StatusEnum {
+public enum StatusCorreosEnum {
     NO_DEFINIDO("Ninguno", 0),
     PRE_REGISTRADO("Pre-registrado", 1),
     ADMITIDO("Admitido", 2),
@@ -10,7 +10,7 @@ public enum StatusEnum {
     private String name;
     private int order;
 
-    StatusEnum(String name, int order) {
+    StatusCorreosEnum(String name, int order) {
         this.name = name;
         this.order = order;
     }
@@ -23,8 +23,8 @@ public enum StatusEnum {
         return this.order;
     }
 
-    public static StatusEnum getStatus(String name) {
-        for (StatusEnum c : values()) {
+    public static StatusCorreosEnum getStatus(String name) {
+        for (StatusCorreosEnum c : values()) {
             if (c.name.equals(name)) {
                 return c;
             }
@@ -32,8 +32,8 @@ public enum StatusEnum {
         return null;
     }
 
-    public static StatusEnum getStatus(int n) {
-        for (StatusEnum c : values()) {
+    public static StatusCorreosEnum getStatus(int n) {
+        for (StatusCorreosEnum c : values()) {
             if (c.order == n) {
                 return c;
             }

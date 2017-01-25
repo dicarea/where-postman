@@ -6,7 +6,7 @@ public class BeanRepository {
         private Integer mId;
         private TrackingItem mTracking;
         private Long mTime;
-        private StatusEnum mStatus;
+        private StatusCorreosEnum mStatus;
 
         public Long getTime() {
             return mTime;
@@ -16,11 +16,11 @@ public class BeanRepository {
             mTime = time;
         }
 
-        public StatusEnum getStatus() {
+        public StatusCorreosEnum getStatus() {
             return mStatus;
         }
 
-        public void setStatus(StatusEnum status) {
+        public void setStatus(StatusCorreosEnum status) {
             mStatus = status;
         }
 

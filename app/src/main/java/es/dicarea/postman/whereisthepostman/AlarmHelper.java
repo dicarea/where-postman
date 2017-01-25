@@ -23,17 +23,6 @@ public class AlarmHelper {
         return mContext;
     }
 
-    //**********************************
-
-    private Intent createCommonIntent() {
-        Intent intent = new Intent(getContext(), StatusReceiver.class);
-        intent.setAction(StatusReceiver.ACTION_ALARM_RECEIVER);
-        return intent;
-    }
-
-    private PendingIntent crateCommonPendingIntent(Intent intent) {
-        return PendingIntent.getBroadcast(getContext(), REQUEST_CODE, intent, PendingIntent.FLAG_CANCEL_CURRENT);
-    }
 
     //**********************************
 
@@ -54,6 +43,18 @@ public class AlarmHelper {
     public boolean checkAlarm() {
         Intent intent = createCommonIntent();
         return PendingIntent.getBroadcast(getContext(), REQUEST_CODE, intent, PendingIntent.FLAG_NO_CREATE) != null;
+    }
+
+    //**********************************
+
+    private Intent createCommonIntent() {
+        Intent intent = new Intent(getContext(), StatusBroadcastReceiver.class);
+        intent.setAction(StatusBroadcastReceiver.ACTION_ALARM_RECEIVER);
+        return intent;
+    }
+
+    private PendingIntent crateCommonPendingIntent(Intent intent) {
+        return PendingIntent.getBroadcast(getContext(), REQUEST_CODE, intent, PendingIntent.FLAG_CANCEL_CURRENT);
     }
 
 }

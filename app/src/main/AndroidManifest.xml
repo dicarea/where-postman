@@ -22,7 +22,7 @@
             android:parentActivityName=".MainActivity"
             android:theme="@style/AppTheme"/>
 
-        <receiver android:name="es.dicarea.postman.whereisthepostman.StatusReceiver"/>
+        <receiver android:name="es.dicarea.postman.whereisthepostman.StatusBroadcastReceiver"/>
     </application>
 
 </manifest>
