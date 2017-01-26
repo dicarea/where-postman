@@ -1,14 +1,13 @@
 package es.dicarea.postman.whereisthepostman;
 
-import android.app.Dialog;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.WindowManager;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 
@@ -36,10 +35,6 @@ public class MainActivity extends AppCompatActivity {
         refreshList();
     }
 
-
-    /**
-     *
-     */
     private void refreshList() {
         listView = (ListView) findViewById(R.id.tracking_list);
         DataSource ds = DataSource.getInstance();
@@ -62,33 +57,7 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_add:
-                final Dialog commentDialog = new Dialog(this);
-                commentDialog.setContentView(R.layout.modal_new);
-                Button okBtn = (Button) commentDialog.findViewById(R.id.ok);
-                okBtn.setOnClickListener(new View.OnClickListener() {
-
-                    @Override
-                    public void onClick(View v) {
-                        DataSource ds = DataSource.getInstance();
-                        TrackingItem trackingItem = new TrackingItem();
-                        EditText code = (EditText) commentDialog.findViewById(R.id.modal_tracking);
-                        EditText desc = (EditText) commentDialog.findViewById(R.id.modal_desc);
-                        trackingItem.setCode(code.getText().toString());
-                        trackingItem.setDesc(desc.getText().toString());
-                        ds.addTracking(trackingItem);
-                        refreshList();
-                        commentDialog.dismiss();
-                    }
-                });
-                Button cancelBtn = (Button) commentDialog.findViewById(R.id.cancel);
-                cancelBtn.setOnClickListener(new View.OnClickListener() {
-
-                    @Override
-                    public void onClick(View v) {
-                        commentDialog.dismiss();
-                    }
-                });
-                commentDialog.show();
+                showNewDialog();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -100,6 +69,31 @@ public class MainActivity extends AppCompatActivity {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.main_menu, menu);
         return true;
+    }
+
+    //******************************
+
+    private void showNewDialog() {
+
+        final View updateLayout = getLayoutInflater().inflate(R.layout.modal_new, null);
+        final EditText codeDialog = (EditText) updateLayout.findViewById(R.id.modal_tracking);
+        final EditText descDialog = (EditText) updateLayout.findViewById(R.id.modal_desc);
+
+        AlertDialog editDialog = new AlertDialog.Builder(this)
+                .setView(updateLayout)
+                .setTitle(R.string.new_tracking)
+                .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        TrackingItem tracking = new TrackingItem();
+                        tracking.setCode(codeDialog.getText().toString());
+                        tracking.setDesc(descDialog.getText().toString());
+                        DataSource.getInstance().addTracking(tracking);
+                        refreshList();
+                    }
+                }).setNegativeButton(R.string.cancel, null)
+                .create();
+
+        editDialog.show();
     }
 
 }

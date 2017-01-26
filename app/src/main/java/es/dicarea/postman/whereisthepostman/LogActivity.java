@@ -131,7 +131,7 @@ public class LogActivity extends AppCompatActivity {
     }
 
     private void forceStatusReq() {
-        new StatusReqHelper().executeRequestSync();
+        new StatusReqHelper().executeRequestSync(tracking);
         refreshLog();
     }
 

@@ -8,10 +8,10 @@
     <string name="ok">OK</string>
     <string name="warning">Warning !!</string>
     <string name="delete_ask">Delete tracking ?</string>
-    <string name="new_tracking">New Tracking</string>
     <string name="log_edit_tracking">Edit Tracking</string>
     <string name="log_delete_tracking">Delete Tracking</string>
     <string name="log_clear_log">Clear Log</string>
     <string name="log_force_request">Force Request</string>
     <string name="update_tracking">Update Tracking</string>
+    <string name="new_tracking">New Tracking</string>
 </resources>
