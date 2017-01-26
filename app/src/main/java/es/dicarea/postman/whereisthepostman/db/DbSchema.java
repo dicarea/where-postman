@@ -6,9 +6,10 @@ public class DbSchema {
 
         public static final class Cols {
             public static final String ID = "id";
-            public static final String DATE = "date";
+            public static final String DATE_LOG = "date";
             public static final String STATUS = "status";
             public static final String TRACKING_ID = "tracking_id";
+            public static final String DATE_STATUS = "date_status";
         }
     }
 

@@ -7,6 +7,7 @@ public class BeanRepository {
         private TrackingItem mTracking;
         private Long mTime;
         private StatusCorreosEnum mStatus;
+        private Long mTimeLastStatus;
 
         public Long getTime() {
             return mTime;
@@ -38,6 +39,14 @@ public class BeanRepository {
 
         public void setTracking(TrackingItem tracking) {
             mTracking = tracking;
+        }
+
+        public Long getTimeLastStatus() {
+            return mTimeLastStatus;
+        }
+
+        public void setTimeLastStatus(Long timeLastStatus) {
+            mTimeLastStatus = timeLastStatus;
         }
     }
 

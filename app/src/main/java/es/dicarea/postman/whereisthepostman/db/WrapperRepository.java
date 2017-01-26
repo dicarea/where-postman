@@ -17,14 +17,16 @@ public class WrapperRepository {
 
         public StatusItem getElement() {
             Integer id = getInt(getColumnIndex(DbSchema.StatusTable.Cols.ID));
-            Long time = getLong(getColumnIndex(DbSchema.StatusTable.Cols.DATE));
+            Long time = getLong(getColumnIndex(DbSchema.StatusTable.Cols.DATE_LOG));
             Integer status = getInt(getColumnIndex(DbSchema.StatusTable.Cols.STATUS));
             Integer trackingId = getInt(getColumnIndex(DbSchema.StatusTable.Cols.TRACKING_ID));
+            Long timeLastStatus = getLong(getColumnIndex(DbSchema.StatusTable.Cols.DATE_STATUS));
 
             StatusItem statusItem = new StatusItem();
             statusItem.setId(id);
             statusItem.setTime(time);
             statusItem.setStatus(StatusCorreosEnum.getStatus(status));
+            statusItem.setTimeLastStatus(timeLastStatus);
 
             TrackingItem tracking = new TrackingItem();
             tracking.setId(trackingId);

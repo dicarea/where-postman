@@ -39,6 +39,9 @@ public class MainActivity extends AppCompatActivity {
         listView = (ListView) findViewById(R.id.tracking_list);
         DataSource ds = DataSource.getInstance();
         List<TrackingItem> trackingList = ds.getTrackingList();
+        for (TrackingItem trackingItem : trackingList) {
+            trackingItem.setLastStatus(ds.getLastValidStatus(trackingItem.getId()));
+        }
         TrackingAdapter adapter = new TrackingAdapter(this, trackingList);
         listView.setAdapter(adapter);
     }

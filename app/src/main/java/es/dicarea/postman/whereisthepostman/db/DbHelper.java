@@ -22,9 +22,10 @@ public class DbHelper extends SQLiteOpenHelper {
 
         db.execSQL("create table " + DbSchema.StatusTable.NAME + "(" +
                 DbSchema.StatusTable.Cols.ID + " integer primary key autoincrement, " +
-                DbSchema.StatusTable.Cols.DATE + ", " +
+                DbSchema.StatusTable.Cols.DATE_LOG + ", " +
                 DbSchema.StatusTable.Cols.STATUS + ", " +
-                DbSchema.StatusTable.Cols.TRACKING_ID +
+                DbSchema.StatusTable.Cols.TRACKING_ID + ", " +
+                DbSchema.StatusTable.Cols.DATE_STATUS +
                 ")"
         );
 
@@ -56,19 +57,16 @@ public class DbHelper extends SQLiteOpenHelper {
         alc.add(null);
         alc.add(null);
 
-
         try {
             String maxQuery = Query;
             //execute the query results will be save in Cursor c
             Cursor c = sqlDB.rawQuery(maxQuery, null);
-
 
             //add value to cursor2
             Cursor2.addRow(new Object[]{"Success"});
 
             alc.set(1, Cursor2);
             if (null != c && c.getCount() > 0) {
-
 
                 alc.set(0, c);
                 c.moveToFirst();
@@ -85,7 +83,6 @@ public class DbHelper extends SQLiteOpenHelper {
             alc.set(1, Cursor2);
             return alc;
         }
-
 
     }
 }

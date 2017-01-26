@@ -10,7 +10,6 @@ import java.util.List;
 import es.dicarea.postman.whereisthepostman.BeanRepository.StatusItem;
 import es.dicarea.postman.whereisthepostman.BeanRepository.TrackingItem;
 import es.dicarea.postman.whereisthepostman.CustomApp;
-import es.dicarea.postman.whereisthepostman.StatusCorreosEnum;
 import es.dicarea.postman.whereisthepostman.db.WrapperRepository.StatusCursorWrapper;
 import es.dicarea.postman.whereisthepostman.db.WrapperRepository.TrackingCursorWrapper;
 
@@ -34,8 +33,19 @@ public class DataSource {
         ContentValues values = new ContentValues();
         values.put(DbSchema.StatusTable.Cols.ID, statusItem.getId());
         values.put(DbSchema.StatusTable.Cols.TRACKING_ID, statusItem.getTracking().getId());
-        values.put(DbSchema.StatusTable.Cols.DATE, statusItem.getTime());
+        values.put(DbSchema.StatusTable.Cols.DATE_LOG, statusItem.getTime());
         values.put(DbSchema.StatusTable.Cols.STATUS, statusItem.getStatus().getOrder());
+        values.put(DbSchema.StatusTable.Cols.DATE_STATUS, statusItem.getTimeLastStatus());
+        return values;
+    }
+
+    private static ContentValues getContentValues(TrackingItem trackingItem) {
+        ContentValues values = new ContentValues();
+        values.put(DbSchema.TrackingTable.Cols.ID, trackingItem.getId());
+        values.put(DbSchema.TrackingTable.Cols.CODE, trackingItem.getCode());
+        values.put(DbSchema.TrackingTable.Cols.DESC, trackingItem.getDesc());
+        values.put(DbSchema.TrackingTable.Cols.ACTIVE, true);
+        values.put(DbSchema.TrackingTable.Cols.DELETED, false);
         return values;
     }
 
@@ -49,7 +59,7 @@ public class DataSource {
 
         String query = "SELECT * FROM " + DbSchema.StatusTable.NAME +
                 " WHERE " + DbSchema.StatusTable.Cols.TRACKING_ID + " = " + trackingId +
-                " ORDER BY " + DbSchema.StatusTable.Cols.DATE + " DESC " +
+                " ORDER BY " + DbSchema.StatusTable.Cols.DATE_LOG + " DESC " +
                 " LIMIT 30";
 
         Cursor cursor = mDatabase.rawQuery(query, null);
@@ -72,28 +82,30 @@ public class DataSource {
         return statusItems;
     }
 
-    public StatusCorreosEnum getLastValidStatus(Integer trackingId) {
+    public StatusItem getLastValidStatus(Integer trackingId) {
 
-        String query = "SELECT " + DbSchema.StatusTable.Cols.STATUS +
+        String query = "SELECT * " +
                 " FROM " + DbSchema.StatusTable.NAME +
                 " WHERE " + DbSchema.StatusTable.Cols.TRACKING_ID + " = " + trackingId +
                 " AND " + DbSchema.StatusTable.Cols.STATUS + " != 0 " +
-                " ORDER BY " + DbSchema.StatusTable.Cols.DATE + " DESC " +
+                " ORDER BY " + DbSchema.StatusTable.Cols.DATE_LOG + " DESC " +
                 " LIMIT 1 ";
 
         Cursor cursor = mDatabase.rawQuery(query, null);
+        StatusCursorWrapper statusCursor = new StatusCursorWrapper(cursor);
         try {
-            if (cursor != null && cursor.moveToFirst()) {
-                Integer status = cursor.getInt(cursor.getColumnIndex(DbSchema.StatusTable.Cols.STATUS));
-                return StatusCorreosEnum.getStatus(status);
+            if (statusCursor != null && statusCursor.moveToFirst()) {
+                return statusCursor.getElement();
             }
         } finally {
-            if (cursor != null) {
-                cursor.close();
+            if (statusCursor != null) {
+                statusCursor.close();
             }
         }
         return null;
     }
+
+    //******************** TRACKING *******************
 
     public void deleteStatusByTracking(Integer idTracking) {
         String strSQL = "DELETE FROM " + DbSchema.StatusTable.NAME + " " +
@@ -101,8 +113,6 @@ public class DataSource {
 
         mDatabase.execSQL(strSQL);
     }
-
-    //******************** TRACKING *******************
 
     public List<TrackingItem> getTrackingListActive() {
 
@@ -176,26 +186,6 @@ public class DataSource {
         return null;
     }
 
-    public TrackingItem getTrackingByCode(String code) {
-
-        String query = "SELECT * FROM " + DbSchema.TrackingTable.NAME +
-                " WHERE " + DbSchema.TrackingTable.Cols.CODE + " = '" + code + "'";
-
-        Cursor cursor = mDatabase.rawQuery(query, null);
-        TrackingCursorWrapper trackingCursor = new TrackingCursorWrapper(cursor);
-        try {
-            if (trackingCursor != null && trackingCursor.moveToFirst()) {
-
-                return trackingCursor.getElement();
-            }
-        } finally {
-            if (cursor != null) {
-                cursor.close();
-            }
-        }
-        return null;
-    }
-
     public void addTracking(TrackingItem trackingItem) {
         ContentValues values = getContentValues(trackingItem);
         long id = mDatabase.insert(DbSchema.TrackingTable.NAME, null, values);
@@ -220,16 +210,6 @@ public class DataSource {
                 " WHERE " + DbSchema.TrackingTable.Cols.ID + " = " + tracking.getId();
 
         mDatabase.execSQL(strSQL);
-    }
-
-    private static ContentValues getContentValues(TrackingItem trackingItem) {
-        ContentValues values = new ContentValues();
-        values.put(DbSchema.TrackingTable.Cols.ID, trackingItem.getId());
-        values.put(DbSchema.TrackingTable.Cols.CODE, trackingItem.getCode());
-        values.put(DbSchema.TrackingTable.Cols.DESC, trackingItem.getDesc());
-        values.put(DbSchema.TrackingTable.Cols.ACTIVE, true);
-        values.put(DbSchema.TrackingTable.Cols.DELETED, false);
-        return values;
     }
 
 }

@@ -13,6 +13,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,15 +38,23 @@ public class StatusAsyncTask extends AsyncTask<TrackingItem, Void, List<StatusIt
         List<StatusItem> notifyList = new ArrayList<>();
 
         for (TrackingItem tracking : items) {
-            StatusCorreosEnum status = findStatus(tracking);
+            Document doc = null;
+            try {
+                doc = Jsoup.connect(URL + tracking.getCode()).get();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            StatusCorreosEnum status = findStatus(doc);
+            Long timeLast = findTime(doc);
             if (checkNotifyRequired(status, tracking.getId())) {
                 StatusItem statusItem = new StatusItem();
                 statusItem.setTracking(tracking);
                 statusItem.setTime(timeNow);
                 statusItem.setStatus(status);
+                statusItem.setTimeLastStatus(timeLast);
                 notifyList.add(statusItem);
             }
-            storeStatus(status, tracking.getId());
+            storeStatus(status, tracking.getId(), timeLast);
         }
 
         return notifyList;
@@ -58,11 +67,12 @@ public class StatusAsyncTask extends AsyncTask<TrackingItem, Void, List<StatusIt
         }
     }
 
-    private void storeStatus(StatusCorreosEnum statusEnum, Integer trackingId) {
+    private void storeStatus(StatusCorreosEnum statusEnum, Integer trackingId, Long timeStatus) {
         DataSource dataSource = DataSource.getInstance();
         StatusItem statusItem = new StatusItem();
         statusItem.setTime(timeNow);
         statusItem.setStatus(statusEnum);
+        statusItem.setTimeLastStatus(timeStatus);
         TrackingItem tracking = new TrackingItem();
         tracking.setId(trackingId);
         statusItem.setTracking(tracking);
@@ -70,10 +80,9 @@ public class StatusAsyncTask extends AsyncTask<TrackingItem, Void, List<StatusIt
     }
 
     public boolean checkNotifyRequired(StatusCorreosEnum status, Integer trackingId) {
-        DataSource ds = DataSource.getInstance();
-        StatusCorreosEnum lastStatus = ds.getLastValidStatus(trackingId);
+        StatusItem statusItem = DataSource.getInstance().getLastValidStatus(trackingId);
         /* Only notification if status changes to a higher one. */
-        return lastStatus == null || lastStatus.getOrder() < status.getOrder();
+        return statusItem == null || statusItem.getStatus().getOrder() < status.getOrder();
     }
 
     public void sendNotification(StatusItem statusItem) {
@@ -102,18 +111,27 @@ public class StatusAsyncTask extends AsyncTask<TrackingItem, Void, List<StatusIt
         notificationManager.notify(statusItem.getStatus().getOrder(), myNotification);
     }
 
-    private StatusCorreosEnum findStatus(BeanRepository.TrackingItem tracking) {
-        try {
-            Document doc = Jsoup.connect(URL + tracking.getCode()).get();
-            Elements elements = doc.select("span.txtNormal");
-            if (elements != null && elements.size() > 0) {
-                String statusStr = elements.get(elements.size() - 1).text().trim();
-                return StatusCorreosEnum.getStatus(statusStr);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
+    private StatusCorreosEnum findStatus(Document doc) {
+        Elements elements = doc.select("span.txtNormal");
+        if (elements != null && elements.size() > 0) {
+            String statusStr = elements.get(elements.size() - 1).text().trim();
+            return StatusCorreosEnum.getStatus(statusStr);
         }
         return StatusCorreosEnum.NO_DEFINIDO;
+    }
+
+    private Long findTime(Document doc) {
+        Elements elements = doc.select("td.txtDescripcionTabla");
+        if (elements != null && elements.size() > 0) {
+            try {
+                String value = elements.get(elements.size() - 1).text().trim();
+                SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+                return Long.valueOf(sdf.parse(value).getTime());
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+        }
+        return null;
     }
 
 }
