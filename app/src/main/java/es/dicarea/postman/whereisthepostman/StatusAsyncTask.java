@@ -24,7 +24,7 @@ import es.dicarea.postman.whereisthepostman.db.DataSource;
 
 public class StatusAsyncTask extends AsyncTask<TrackingItem, Void, List<StatusItem>> {
 
-    private static final String URL = "http://aplicacionesweb.correos.es/localizadorenvios/track.asp?accion=LocalizaUno&numero=";
+    private static final String URL_BASE = "http://aplicacionesweb.correos.es/localizadorenvios/track.asp?accion=LocalizaUno&numero=";
     private long timeNow;
 
 
@@ -38,21 +38,18 @@ public class StatusAsyncTask extends AsyncTask<TrackingItem, Void, List<StatusIt
         List<StatusItem> notifyList = new ArrayList<>();
 
         for (TrackingItem tracking : items) {
-            Document doc = null;
-            try {
-                doc = Jsoup.connect(URL + tracking.getCode()).get();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            Document doc = getHTML(URL_BASE + tracking.getCode());
             StatusCorreosEnum status = findStatus(doc);
             Long timeLast = findTime(doc);
-            if (checkNotifyRequired(status, tracking.getId())) {
-                StatusItem statusItem = new StatusItem();
-                statusItem.setTracking(tracking);
-                statusItem.setTime(timeNow);
-                statusItem.setStatus(status);
-                statusItem.setTimeLastStatus(timeLast);
-                notifyList.add(statusItem);
+            if (status != StatusCorreosEnum.NO_DEFINIDO) {
+                if (checkNotifyRequired(status, tracking.getId())) {
+                    StatusItem statusItem = new StatusItem();
+                    statusItem.setTracking(tracking);
+                    statusItem.setTime(timeNow);
+                    statusItem.setStatus(status);
+                    statusItem.setTimeLastStatus(timeLast);
+                    notifyList.add(statusItem);
+                }
             }
             storeStatus(status, tracking.getId(), timeLast);
         }
@@ -79,10 +76,10 @@ public class StatusAsyncTask extends AsyncTask<TrackingItem, Void, List<StatusIt
         dataSource.addStatus(statusItem);
     }
 
-    public boolean checkNotifyRequired(StatusCorreosEnum status, Integer trackingId) {
-        StatusItem statusItem = DataSource.getInstance().getLastValidStatus(trackingId);
-        /* Only notification if status changes to a higher one. */
-        return statusItem == null || statusItem.getStatus().getOrder() < status.getOrder();
+    public boolean checkNotifyRequired(StatusCorreosEnum newStatusEnum, Integer trackingId) {
+        StatusItem prevStatus = DataSource.getInstance().getLastValidStatus(trackingId);
+        /* Only notification if status changes to a higher one or first change. */
+        return prevStatus == null || prevStatus.getStatus().getOrder() < newStatusEnum.getOrder();
     }
 
     public void sendNotification(StatusItem statusItem) {
@@ -112,24 +109,37 @@ public class StatusAsyncTask extends AsyncTask<TrackingItem, Void, List<StatusIt
     }
 
     private StatusCorreosEnum findStatus(Document doc) {
-        Elements elements = doc.select("span.txtNormal");
-        if (elements != null && elements.size() > 0) {
-            String statusStr = elements.get(elements.size() - 1).text().trim();
-            return StatusCorreosEnum.getStatus(statusStr);
+        if (doc != null) {
+            Elements elements = doc.select("span.txtNormal");
+            if (elements != null && elements.size() > 0) {
+                String statusStr = elements.get(elements.size() - 1).text().trim();
+                return StatusCorreosEnum.getStatus(statusStr);
+            }
         }
         return StatusCorreosEnum.NO_DEFINIDO;
     }
 
     private Long findTime(Document doc) {
-        Elements elements = doc.select("td.txtDescripcionTabla");
-        if (elements != null && elements.size() > 0) {
-            try {
-                String value = elements.get(elements.size() - 1).text().trim();
-                SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-                return Long.valueOf(sdf.parse(value).getTime());
-            } catch (ParseException e) {
-                e.printStackTrace();
+        if (doc != null) {
+            Elements elements = doc.select("td.txtDescripcionTabla");
+            if (elements != null && elements.size() > 0) {
+                try {
+                    String value = elements.get(elements.size() - 1).text().trim();
+                    SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+                    return Long.valueOf(sdf.parse(value).getTime());
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
             }
+        }
+        return null;
+    }
+
+    private Document getHTML(String url) {
+        try {
+            return Jsoup.connect(url).get();
+        } catch (IOException e) {
+            // IGNORE
         }
         return null;
     }
