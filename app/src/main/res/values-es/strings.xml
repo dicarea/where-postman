@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">Correos Notifier</string>
+    <string name="tracking_code">Nº Seguimiento</string>
+    <string name="description">Descripción</string>
+    <string name="add">Añadir</string>
+    <string name="update">Modificar</string>
+    <string name="cancel">Cancelar</string>
+    <string name="ok">OK</string>
+    <string name="warning">Cuidado !!</string>
+    <string name="delete_ask">¿Borrar seguimiento?</string>
+    <string name="new_tracking">Nuevo Seguimiento</string>
+    <string name="log_edit_tracking">Modificar Seguimiento</string>
+    <string name="update_tracking">Modificar Seguimiento</string>
+    <string name="log_delete_tracking">Borrar Seguimiento</string>
+    <string name="log_clear_log">Limpiar Log</string>
+    <string name="log_force_request">Forzar Petición</string>
+    <string name="last_check">Última comprobación:</string>
+</resources>
