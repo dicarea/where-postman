@@ -1,3 +1,3 @@
 # where-postman
 
-adb shell dumpsys alarm
+Alarm Manager example.
