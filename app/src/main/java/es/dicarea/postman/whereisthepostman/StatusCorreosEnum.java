@@ -5,7 +5,9 @@ public enum StatusCorreosEnum {
     PRE_REGISTRADO("Pre-registrado", 1),
     ADMITIDO("Admitido", 2),
     EN_ENTREGA("En proceso de entrega", 3),
-    ENTREGADO("Entregado", 4);
+    PENDIENTE_RECOGIDA("Envío pendiente de ser recogido en Oficina Postal", 4),
+    ENTREGADO("Entregado", 5),
+    DESCONOCIDO("Desconocido", 6);
 
     private String name;
     private int order;
@@ -29,7 +31,7 @@ public enum StatusCorreosEnum {
                 return c;
             }
         }
-        return null;
+        return DESCONOCIDO;
     }
 
     public static StatusCorreosEnum getStatus(int n) {
